@@ -4,3 +4,6 @@ twitter-datasets
 .DS_Store
 .AppleDouble
 .LSOverride
+
+#ignore /twitter-datasets repo
+**/twitter-datasets
