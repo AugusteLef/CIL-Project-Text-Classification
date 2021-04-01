@@ -1,1 +1,6 @@
-twitter-datasets
+# everything data related
+Data
+
+# environment helper files
+__pycache__
+
