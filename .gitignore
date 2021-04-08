@@ -5,5 +5,8 @@ twitter-datasets
 .AppleDouble
 .LSOverride
 
-#ignore /twitter-datasets repo
+# ignore /twitter-datasets repo
 **/twitter-datasets
+
+# hide conda environment file (if someone else is using conda we could also consider sharing this file)
+environment.yml
