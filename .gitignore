@@ -1,5 +1,3 @@
-twitter-datasets
-
 # MacOS
 .DS_Store
 .AppleDouble
@@ -7,11 +5,13 @@ twitter-datasets
 
 # ignore /twitter-datasets repo
 **/twitter-datasets
-
-# hide conda environment file (if someone else is using conda we could also consider sharing this file)
-environment.yml
 # everything data related
 Data
+
+# hide individual venv files
+environment.yml
+.idea
+
 
 # environment helper files
 __pycache__

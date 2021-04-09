@@ -17,7 +17,9 @@ def preprocess_tweet(tweet):
     tweet = re.sub('[0-9]', '', tweet) # numbers
     #tweet = re.sub('USER', '<user>', tweet)
     #tweet = re.sub('URL', '<url>', tweet)
-    tweet = ' '.join([speller(w) for w in tweet.split()])
-    tweet = ' '.join(ws.segment(tweet))
     #tweet = ' '.join([segmenter.segment(tweet) for w in tweet.split()])
     return tweet
+
+def spellcheck_tweet(tweet):
+    tweet = ' '.join([speller(w) for w in tweet.split()])
+    tweet = ' '.join(ws.segment(tweet))
