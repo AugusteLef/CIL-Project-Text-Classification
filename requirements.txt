@@ -1,1 +1,10 @@
 certifi==2020.12.5
+cffi @ file:///opt/concourse/worker/volumes/live/ca3c0fea-9d0f-4489-6889-89b42078ed37/volume/cffi_1613246931142/work
+mkl-fft==1.3.0
+mkl-random==1.1.1
+mkl-service==2.3.0
+numpy @ file:///opt/concourse/worker/volumes/live/a1b5ea96-b05c-40ba-5dfb-4542ece1c186/volume/numpy_and_numpy_base_1603491228242/work
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+six @ file:///opt/concourse/worker/volumes/live/f983ba11-c9fe-4dff-7ce7-d89b95b09771/volume/six_1605205318156/work
+torch @ file:///opt/concourse/worker/volumes/live/11e8f1df-b219-4bb1-5397-3a9589bb82c1/volume/pytorch_1614404301885/work
+typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1611751222202/work
