@@ -10,3 +10,9 @@ twitter-datasets
 
 # hide conda environment file (if someone else is using conda we could also consider sharing this file)
 environment.yml
+# everything data related
+Data
+
+# environment helper files
+__pycache__
+
