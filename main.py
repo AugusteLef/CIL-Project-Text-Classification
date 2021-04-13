@@ -6,7 +6,7 @@ PATH_DATA_POS = "Data/train_pos_preprocessed.txt"
 PRE_TRAINED_MODEL_NAME = "bert-base-uncased"
 MAX_SEQ_LEN = 98
 N_EPOCHS = 1
-BATCH_SIZE = 1
+BATCH_SIZE = 2
 
 class TwitterDataset(torch.utils.data.Dataset):
 
@@ -43,8 +43,8 @@ class TwitterDataset(torch.utils.data.Dataset):
             return_tensors='pt',
         )
 
-        input_ids = encoding['input_ids']
-        attention_mask = encoding['attention_mask']
+        input_ids = encoding['input_ids'].flatten()
+        attention_mask = encoding['attention_mask'].flatten()
         return input_ids, attention_mask, label
 
 class BertBinarySeqClassifier(torch.nn.Module):
@@ -80,16 +80,13 @@ def main():
     
     model = BertBinarySeqClassifier()
     
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.01)
     loss_fn = torch.nn.CrossEntropyLoss()
 
     model.train()
     for epoch in range(N_EPOCHS):
         for input_ids, attention_mask, label in dl:
-            input_ids = input_ids.squeeze(dim=0)
-            attention_mask = attention_mask.squeeze(dim=0)
             pred = model(input_ids, attention_mask)
-            pred.unsqueeze(dim=0)
             loss = loss_fn(pred, label)
             print(loss)
             optimizer.zero_grad()
