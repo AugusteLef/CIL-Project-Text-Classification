@@ -4,7 +4,7 @@ from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import AdamW
 from pathlib import Path
 
-DIR_DATA = "Data"
+DIR_DATA = os.environ["SCRATCH"]
 PATH_DATA_NEG = os.path.join(DIR_DATA, "train_neg_preprocessed.txt")
 PATH_DATA_POS = os.path.join(DIR_DATA, "train_pos_preprocessed.txt")
 DIR_PRETRAINED = "Pretrained/bert-base-uncased"
@@ -74,7 +74,7 @@ def main():
     model.train()
     for epoch in range(N_EPOCHS):
         if VERBOSE: print("epoch %d..." % epoch)
-        avg_loss = torch.tensor(0.0)
+        avg_loss = 0.0
         for i, batch in enumerate(dl):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
@@ -83,12 +83,12 @@ def main():
             loss = outputs[0]
             loss /= ACCUMULATION_SIZE
             loss.backward()
-            avg_loss += loss.detach()
+            avg_loss += loss.item()
             if (i + 1) % ACCUMULATION_SIZE == 0:
                 optimizer.step()
                 optimizer.zero_grad() 
-                print(avg_loss)
-                avg_loss = torch.tensor(0.0)
+                print("avg. loss: %.3f" % avg_loss)
+                avg_loss = 0.0
 
 if __name__ == "__main__":
     main()
