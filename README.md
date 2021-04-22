@@ -32,3 +32,28 @@ Your task is to fill in the SGD updates to the template
 glove_template.py
 
 Once you tested your system on the small set of 10% of all tweets, we suggest you run on the full datasets train_pos_full.txt, train_neg_full.txt
+
+## Instructions
+
+Start virtual environment:
+source venv/bin/activate
+
+Install dependencies:
+pip install -r requirements.txt
+
+Get Imdb dataset:
+wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+tar -xf aclImdb_v1.tar.gz
+
+Move Imdb dataset to data directory (you will have to adjust DIR_DATA param in main.py if not $SCRATCH):
+mv aclImdb $SCRATCH/
+
+Preload preprocessed parameters:
+python3 preloading.py
+
+Only for leonhard:
+Load modules:
+module load gcc/6.3.0 python_gpu/3.8.5
+
+Submit job:
+bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl=1]" -o output python3 main.py
