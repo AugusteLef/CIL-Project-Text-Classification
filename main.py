@@ -109,7 +109,7 @@ def main():
             outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
             preds = torch.argmax(outputs[1], dim=1)
             count_correct += torch.sum(preds == labels).item()
-    accuracy = count_correct / len(dl_test)
+    accuracy = count_correct / len(ds_test)
     print("accuracy: %.3f" % accuracy)
 
 if __name__ == "__main__":
