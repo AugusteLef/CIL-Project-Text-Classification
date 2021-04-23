@@ -56,4 +56,4 @@ Load modules:
 module load gcc/6.3.0 python_gpu/3.8.5
 
 Submit job:
-bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl=1]" -o output python3 main.py
+bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -o output python3 main.py
