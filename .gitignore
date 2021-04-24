@@ -8,10 +8,15 @@
 # everything data related
 Data
 
+<<<<<<< HEAD
 # hide individual venv files
 environment.yml
 .idea
 
+=======
+# everything pretrained models related
+Pretrained
+>>>>>>> tobiabir
 
 # environment helper files
 __pycache__

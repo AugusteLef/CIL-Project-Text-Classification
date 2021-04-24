@@ -1,11 +1,11 @@
 import re
+import sys
+
 #import wordsegment as ws
 #ws.load()
 #import autocorrect as ac
 #speller = ac.Speller(lang='en')
 
-PATH_INPUT = "Data/train_neg.txt"
-PATH_OUTPUT = "Data/train_neg_preprocessed.txt"
 VERBOSE = 1
 
 def preprocess_tweet(tweet):
@@ -26,7 +26,7 @@ def preprocess_tweet(tweet):
     #tweet = ' '.join([speller(w) for w in tweet.split()]) # spell checking
     return tweet
 
-def main():
+def main(PATH_INPUT, PATH_OUTPUT):
     if VERBOSE:
         print("reading input from %s..." % PATH_INPUT)    
     f_in = open(PATH_INPUT, "r")
@@ -45,5 +45,8 @@ def main():
     f_out.writelines(l)
 
 if __name__ == "__main__":
-    main()
+    if(len(sys.argv) < 3):
+        print("arg1: input path, arg2: output path")
+    else:
+        main(sys.argv[1], sys.argv[2])
 
