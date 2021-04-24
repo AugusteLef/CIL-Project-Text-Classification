@@ -1,6 +1,9 @@
 # everything data related
 Data
 
+# everything pretrained models related
+Pretrained
+
 # environment helper files
 __pycache__
 
