@@ -76,6 +76,7 @@ def main():
         dataset=ds,
         batch_size=BATCH_SIZE,
         shuffle=True,
+        num_workers=4
     )
     
     model = BertBinarySeqClassifier()
