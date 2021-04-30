@@ -8,15 +8,13 @@
 # everything data related
 Data
 
-<<<<<<< HEAD
 # hide individual venv files
 environment.yml
 .idea
+conda_requirements.txt
 
-=======
 # everything pretrained models related
 Pretrained
->>>>>>> tobiabir
 
 # environment helper files
 __pycache__
