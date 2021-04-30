@@ -7,6 +7,7 @@
 **/twitter-datasets
 # everything data related
 Data
+sample_submission.csv
 
 # hide individual venv files
 environment.yml
