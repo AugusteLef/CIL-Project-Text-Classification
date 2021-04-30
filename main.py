@@ -61,6 +61,7 @@ def main(args):
     encodings_train = tokenizer(texts_train, truncation=True, padding=True)
     encodings_test = tokenizer(texts_test, truncation=True, padding=True)
     
+    # build dataloader
     ds_train = EncodingsDataset(encodings_train, labels_train) 
     ds_test = EncodingsDataset(encodings_test, labels_test) 
     dl_train = torch.utils.data.DataLoader(
@@ -74,14 +75,17 @@ def main(args):
         batch_size=args.batch_size
     )
     
+    # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # load pretrained model
     model = BertForSequenceClassification.from_pretrained(args.pretrained_model)
     model = torch.nn.DataParallel(model)
     model.to(device)
     
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
+    # train
     if args.verbose: print("training...")
     model.train()
     for epoch in range(args.epochs):
@@ -99,9 +103,10 @@ def main(args):
             if (i + 1) % args.accumulation_size == 0:
                 optimizer.step()
                 optimizer.zero_grad() 
-                print("avg. loss: %.3f" % avg_loss)
+                if args.verbose: print("avg. loss: %.3f" % avg_loss)
                 avg_loss = 0.0
-                
+    
+    # evaluate i.e. generate accuracy estimation
     if args.verbose: print("evaluation...")
     model.eval()
     count_correct = 0.0
@@ -115,6 +120,9 @@ def main(args):
             count_correct += torch.sum(preds == labels).item()
     accuracy = count_correct / len(ds_test)
     print("accuracy: %.3f" % accuracy)
+
+    # save model parameters to specified file
+    torch.save(model.state_dict(), args.model_destination)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
@@ -141,7 +149,9 @@ if __name__ == "__main__":
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
 
     args = parser.parse_args()
+
     torch.manual_seed(args.seed)
     random.seed(args.seed)
+
     main(args)
 

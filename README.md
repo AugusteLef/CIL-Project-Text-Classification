@@ -43,12 +43,15 @@ module load StdEnv
 python3 preloading.py
 
 - submitting job:
-bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py
+bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py [args]
 
 - submitting as interactive job for testing (output to terminal):
-bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py
+bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" python3 main.py [args]
 
-- for Imdb dataset (move to scratch before unpacking!):
+- monitoring job
+bbjobs
+
+## IMDB Dataset on Leonhard
 wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
 mv aclImdb $SCRATCH/
 tar -xf aclImdb_v1.tar.gz
