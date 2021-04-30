@@ -13,6 +13,14 @@ import torch.nn as nn
 from torch.utils.data import TensorDataset,DataLoader,RandomSampler,SequentialSampler
 
 
+
+#global variables
+POSITIVE_PATH = '/cluster/home/alefevre/data/twitter/Datas/train_pos.txt'
+NEGATIVE_PATH  = '/cluster/home/alefevre/data/twitter/Datas/train_neg.txt'
+OUTPUT_PREDS_PATH = '/cluster/home/alefevre/results/twitter/XLNET_test_preds.txt'
+N_EPOCHS = 5 # or 3 ?
+BATCH_SIZE = 16
+
 def preprocess_tweet(tweet):
     '''
     :param tweet: tweet as a string
@@ -83,12 +91,12 @@ def main():
     #LOAD AND BASIC PP
 
     #global variables
-    positive_path = '/cluster/home/alefevre/data/twitter/Datas/train_pos.txt'
-    negative_path  = '/cluster/home/alefevre/data/twitter/Datas/train_neg.txt'
+    POSITIVE_PATH = '/cluster/home/alefevre/data/twitter/Datas/train_pos.txt'
+    NEGATIVE_PATH  = '/cluster/home/alefevre/data/twitter/Datas/train_neg.txt'
 
     #load datas
-    pos_df = load_tweet(positive_path, 1)
-    neg_df = load_tweet(negative_path, 0)
+    pos_df = load_tweet(POSITIVE_PATH, 1)
+    neg_df = load_tweet(NEGATIVE_PATH, 0)
 
     #concat datas
     all_tweet_df = concat_data(pos_df, neg_df)
@@ -114,8 +122,7 @@ def main():
     #splitdataset, test size = 10% 
     xtrain,xtest,ytrain,ytest = train_test_split(padded_ids, labels, test_size=0.10)
 
-    #set batchsize
-    batch_size = 3 #why ?
+    
 
     #transform dataset to torch.tensor format
     Xtrain = torch.tensor(xtrain)
@@ -125,8 +132,8 @@ def main():
 
     train_data = TensorDataset(Xtrain,Ytrain)
     test_data = TensorDataset(Xtest,Ytest)
-    loader = DataLoader(train_data,batch_size=batch_size)
-    test_loader = DataLoader(test_data,batch_size=batch_size)
+    loader = DataLoader(train_data,batch_size=BATCH_SIZE)
+    test_loader = DataLoader(test_data,batch_size=BATCH_SIZE)
 
     #set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -143,8 +150,7 @@ def main():
 
     #Training
     no_train = 0
-    epochs = 5
-    for epoch in range(epochs):
+    for epoch in range(N_EPOCH):
         print('Epoch: ' + str(epoch))
         model.train()
         loss1 = []
@@ -187,7 +193,7 @@ def main():
     to_save.append(acc)
     to_save.append(lab)
     to_save.append([accuracy(acc,lab)])
-    np.savetxt('/cluster/home/alefevre/results/twitter/XLNET_test_preds.txt', np.asarray(to_save), delimiter=',', fmt='%s')
+    np.savetxt(OUTPUT_PREDS_PATH, np.asarray(to_save), delimiter=',', fmt='%s')
 
 main()
 
