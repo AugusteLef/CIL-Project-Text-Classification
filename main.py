@@ -89,7 +89,6 @@ def main(args):
     if args.verbose: print("training...")
     model.train()
     for epoch in range(args.epochs):
-        if args.verbose: print("epoch %d..." % epoch)
         avg_loss = 0.0
         for i, batch in enumerate(dl_train):
             input_ids = batch['input_ids'].to(device)
@@ -103,7 +102,11 @@ def main(args):
             if (i + 1) % args.accumulation_size == 0:
                 optimizer.step()
                 optimizer.zero_grad() 
-                if args.verbose: print("avg. loss: %.3f" % avg_loss)
+                if args.verbose:
+                    print(
+                        "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
+                        (epoch, args.epochs, i, len(dl_train), avg_loss)
+                    )
                 avg_loss = 0.0
     
     # evaluate i.e. generate accuracy estimation
@@ -122,6 +125,9 @@ def main(args):
     print("accuracy: %.3f" % accuracy)
 
     # save model parameters to specified file
+    dir_model = os.path.dirname(args.model_destination)
+    if dir_model != "" and not os.path.exists(dir_model):
+        os.path.makedirs(dir_model)
     torch.save(model.state_dict(), args.model_destination)
 
 if __name__ == "__main__":
