@@ -127,7 +127,7 @@ def main(args):
     # save model parameters to specified file
     dir_model = os.path.dirname(args.model_destination)
     if dir_model != "" and not os.path.exists(dir_model):
-        os.path.makedirs(dir_model)
+        os.makedirs(dir_model)
     torch.save(model.state_dict(), args.model_destination)
 
 if __name__ == "__main__":
