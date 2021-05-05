@@ -17,6 +17,7 @@ def get_cleaned_tweets(tweets_data):
     cleaned = [None] * len(tweets_data)
     print(len(tweets_data))
     for i in range(len(tweets_data)):
+        print(tweets_data[i])
         cleaned[i] = readTweets.preprocess(tweets_data[i])
         print('finished'+ str(i))
     return cleaned
