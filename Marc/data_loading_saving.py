@@ -73,7 +73,7 @@ def write_to_text(path: str, df: pd.DataFrame) -> None:
         path (str): path to write
         df (DataFrame): dataframe to save
     """
-    df.to_csv(path, header=True, index=None, sep=',')
+    df.to_csv(path+'output.txt', header=True, index=None, sep=',')
     return
 
 def shuffle_df(df: pd.DataFrame) -> pd.DataFrame:
