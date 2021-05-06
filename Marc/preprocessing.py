@@ -1,16 +1,10 @@
 import argparse
-import glob
+
 import os
-import json
-import time
-import logging
-import random
+
 import re
 import string
-from itertools import chain
-from string import punctuation
-import pandas as pd
-import numpy as np
+
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -456,7 +450,7 @@ def main(args):
         df = data_loading_saving.load_raw_data_testset(args.input_path)
     else:
         df = data_loading_saving.load_raw_data(args.input_path, args.labels)
-
+    print(len(df))
     if args.verbose: print("basic processing...")
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
     if args.verbose: print("processing: replace contraction...")
@@ -480,9 +474,12 @@ def main(args):
         if args.verbose: print("processing: lemmatizing...")
         df['tweet'] = df['tweet'].apply(lambda row: lemmatizing(str(row)))
 
+    if args.verbose: print("basic processing... Again...")
+    df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
+
     if args.verbose: print("writing output to %s..." % args.output_path)
     dir_out = os.path.dirname(args.output_path)
-    if dir_out != "" and not os.path.exists(dir_out):
+    if dir_out != "" and os.path.exists(dir_out):
         data_loading_saving.write_to_text(dir_out, df)
 
 
