@@ -449,7 +449,7 @@ def main(args):
     if args.is_test_set:
         df = data_loading_saving.load_raw_data_testset(args.input_path)
     else:
-        df = data_loading_saving.load_raw_data(args.input_path, args.labels)
+        df = data_loading_saving.load_raw_data_trainingset(args.input_path, args.labels)
     print(len(df))
     if args.verbose: print("basic processing...")
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
