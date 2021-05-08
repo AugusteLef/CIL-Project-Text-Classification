@@ -478,9 +478,9 @@ def main(args):
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
 
     if args.verbose: print("writing output to %s..." % args.output_path)
-    dir_out = os.path.dirname(args.output_path)
-    if dir_out != "" and os.path.exists(dir_out):
-        data_loading_saving.write_to_text(dir_out, df)
+    #dir_out = os.path.dirname(args.output_path)
+    #if dir_out != "" and os.path.exists(dir_out):
+    data_loading_saving.write_to_text(args.output_path, df)
 
 
 if __name__ == "__main__":
