@@ -105,7 +105,7 @@ def main(args):
                 if args.verbose:
                     print(
                         "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
-                        (epoch, args.epochs, i, len(dl_train), avg_loss)
+                        (epoch+1, args.epochs, i, len(dl_train), avg_loss)
                     )
                 avg_loss = 0.0
     
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     parser.add_argument('pos_data', type=str, 
         help='path to positive training data', action='store')
     parser.add_argument('-pm', '--pretrained_model', dest='pretrained_model', type=str, 
-        help='path to pretrained model that should be used', action='store', default='Pretrained/bert-base-uncased')
+        help='path to pretrained model that should be used', default='Pretrained/bert-base-uncased')
     parser.add_argument('model_destination', type=str, 
         help='path where model should be store', action='store')
     parser.add_argument('-v', '--verbose', dest='verbose', 
