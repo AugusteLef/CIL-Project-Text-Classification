@@ -33,10 +33,18 @@ def read_imdb_split(split_dir):
 def main(args):
     # get the data
     if args.verbose: print("reading data...")
-    f_neg = open(args.neg_data)
-    texts_neg = f_neg.readlines()
-    f_pos = open(args.pos_data)
-    texts_pos = f_pos.readlines()
+    if args.neg_data[-3:] == "txt":
+        f_neg = open(args.neg_data)
+        texts_neg = f_neg.readlines()
+    else:
+        df_neg = pd.read_csv(args.neg_data)
+        texts_neg = df_neg["tweet"]
+    if args.pos_data[-3:] == "txt":
+        f_pos = open(args.pos_data)
+        texts_pos = f_pos.readlines()
+    else:
+        df_pos = pd.read_csv(args.pos_data)
+        texts_pos = df_pos["tweet"]
 
     # create train / test split
     n_neg = int(args.split*len(texts_neg))
