@@ -2,7 +2,7 @@ import os
 import torch
 import argparse
 import random
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BartTokenizer, BartForSequenceClassification
 from transformers import AdamW
 from pathlib import Path
 
@@ -38,13 +38,13 @@ def main(args):
         texts_neg = f_neg.readlines()
     else:
         df_neg = pd.read_csv(args.neg_data)
-        texts_neg = df_neg["tweet"]
+        texts_neg = list(df_neg["tweet"])
     if args.pos_data[-3:] == "txt":
         f_pos = open(args.pos_data)
         texts_pos = f_pos.readlines()
     else:
         df_pos = pd.read_csv(args.pos_data)
-        texts_pos = df_pos["tweet"]
+        texts_pos = list(df_pos["tweet"])
 
     # create train / test split
     n_neg = int(args.split*len(texts_neg))
@@ -62,7 +62,7 @@ def main(args):
 
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
-    tokenizer = BertTokenizer.from_pretrained(args.pretrained_model) 
+    tokenizer = BartTokenizer.from_pretrained(args.pretrained_model) 
 
     # apply tokenizer
     if args.verbose: print("tokenizing data...")
@@ -87,7 +87,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = BertForSequenceClassification.from_pretrained(args.pretrained_model)
+    model = BartForSequenceClassification.from_pretrained(args.pretrained_model)
     model = torch.nn.DataParallel(model)
     model.to(device)
     
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     parser.add_argument('pos_data', type=str, 
         help='path to positive training data', action='store')
     parser.add_argument('-pm', '--pretrained_model', dest='pretrained_model', type=str, 
-        help='path to pretrained model that should be used', default='Pretrained/bert-base-uncased')
+        help='path to pretrained model that should be used', default='Pretrained/bart-base')
     parser.add_argument('model_destination', type=str, 
         help='path where model should be store', action='store')
     parser.add_argument('-v', '--verbose', dest='verbose', 
