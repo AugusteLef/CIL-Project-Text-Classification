@@ -74,7 +74,7 @@ def main(args):
     ds_test = EncodingsDataset(encodings_test, labels_test) 
     dl_train = torch.utils.data.DataLoader(
         dataset=ds_train,
-        batch_size=int(args.batch_size/args.accumulation_size),
+        batch_size=args.batch_size//args.accumulation_size,
         shuffle=True,
         num_workers=4
     )
@@ -113,7 +113,7 @@ def main(args):
                 if args.verbose:
                     print(
                         "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
-                        (epoch+1, args.epochs, i, len(dl_train), avg_loss)
+                        (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
                     )
                 avg_loss = 0.0
     
