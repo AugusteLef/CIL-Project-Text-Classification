@@ -5,6 +5,7 @@ import random
 from transformers import BartTokenizer, BartForSequenceClassification
 from transformers import AdamW
 from pathlib import Path
+import pandas as pd
 
 class EncodingsDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
@@ -55,6 +56,9 @@ def main(args):
     labels_train = [0] * n_neg + [1] * n_pos
     texts_test = texts_neg[n_neg:] + texts_pos[n_pos:]
     labels_test = [0] * (len(texts_neg) - n_neg) + [1] * (len(texts_pos) - n_pos)
+    if args.verbose:
+        print("%d training samples" % (n_neg + n_pos))
+        print("%d test samples" % (len(texts_neg) - n_neg + len(texts_pos) - n_pos))
     
     # was used for testing on imdb
     #texts_train, labels_train = read_imdb_split(os.path.join(DIR_DATA, 'aclImdb/train'))
@@ -136,7 +140,7 @@ def main(args):
     dir_model = os.path.dirname(args.model_destination)
     if dir_model != "" and not os.path.exists(dir_model):
         os.makedirs(dir_model)
-    torch.save(model.state_dict(), args.model_destination)
+    model.save_pretrained(args.model_destination)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
