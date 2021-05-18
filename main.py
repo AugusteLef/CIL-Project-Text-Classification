@@ -31,6 +31,24 @@ def read_imdb_split(split_dir):
             labels.append(0 if label_dir == "neg" else 1)
     return texts, labels
 
+def evaluation(args, model, dataloader):
+    # evaluate i.e. generate accuracy estimation
+    if args.verbose: print("evaluation...")
+    model.eval()
+    count_correct = 0.0
+    count_total = 0.0
+    with torch.no_grad():
+        for i, batch in enumerate(dataloader):
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            labels = batch['labels'].to(device)
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            preds = torch.argmax(outputs[1], dim=1)
+            count_correct += torch.sum(preds == labels).item()
+            count_total += len(batch)
+    accuracy = count_correct / count_total
+    print("accuracy: %.5f" % accuracy)
+
 def main(args):
     # get the data
     if args.verbose: print("reading data...")
@@ -38,13 +56,13 @@ def main(args):
         f_neg = open(args.neg_data)
         texts_neg = f_neg.readlines()
     else:
-        df_neg = pd.read_csv(args.neg_data)
+        df_neg = pd.read_csv(args.neg_data, keep_default_na=False)
         texts_neg = list(df_neg["tweet"])
     if args.pos_data[-3:] == "txt":
         f_pos = open(args.pos_data)
         texts_pos = f_pos.readlines()
     else:
-        df_pos = pd.read_csv(args.pos_data)
+        df_pos = pd.read_csv(args.pos_data, keep_default_na=False)
         texts_pos = list(df_pos["tweet"])
 
     # create train / test split
@@ -86,21 +104,20 @@ def main(args):
         dataset=ds_test,
         batch_size=args.batch_size
     )
-    
+
     # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
     model = BartForSequenceClassification.from_pretrained(args.pretrained_model)
-    model = torch.nn.DataParallel(model)
     model.to(device)
     
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
     # train
     if args.verbose: print("training...")
-    model.train()
     for epoch in range(args.epochs):
+        model.train()
         avg_loss = 0.0
         for i, batch in enumerate(dl_train):
             input_ids = batch['input_ids'].to(device)
@@ -120,27 +137,9 @@ def main(args):
                         (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
                     )
                 avg_loss = 0.0
-    
-    # evaluate i.e. generate accuracy estimation
-    if args.verbose: print("evaluation...")
-    model.eval()
-    count_correct = 0.0
-    with torch.no_grad():
-        for i, batch in enumerate(dl_test):
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            labels = batch['labels'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            preds = torch.argmax(outputs[1], dim=1)
-            count_correct += torch.sum(preds == labels).item()
-    accuracy = count_correct / len(ds_test)
-    print("accuracy: %.3f" % accuracy)
-
-    # save model parameters to specified file
-    dir_model = os.path.dirname(args.model_destination)
-    if dir_model != "" and not os.path.exists(dir_model):
-        os.makedirs(dir_model)
-    model.save_pretrained(args.model_destination)
+        evaluation(args, model, dl_test)
+        # save model parameters to specified file
+        model.module.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % epoch))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
