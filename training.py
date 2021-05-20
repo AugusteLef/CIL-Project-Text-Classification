@@ -2,41 +2,16 @@ import os
 import torch
 import argparse
 import random
-from transformers import BartTokenizer, BartForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import AdamW
-from pathlib import Path
 import pandas as pd
+import utils
 
-class EncodingsDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels):
-        self.encodings = encodings
-        self.labels = labels
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-        item['labels'] = torch.tensor(self.labels[idx])
-        return item
-
-# used for testing on imdb dataset
-def read_imdb_split(split_dir):
-    split_dir = Path(split_dir)
-    texts = []
-    labels = []
-    for label_dir in ["pos", "neg"]:
-        for text_file in (split_dir/label_dir).iterdir():
-            texts.append(text_file.read_text())
-            labels.append(0 if label_dir == "neg" else 1)
-    return texts, labels
-
-def evaluation(args, model, dataloader):
+def evaluation(args, model, dataloader, device):
     # evaluate i.e. generate accuracy estimation
     if args.verbose: print("evaluation...")
     model.eval()
     count_correct = 0.0
-    count_total = 0.0
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
             input_ids = batch['input_ids'].to(device)
@@ -45,8 +20,7 @@ def evaluation(args, model, dataloader):
             outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
             preds = torch.argmax(outputs[1], dim=1)
             count_correct += torch.sum(preds == labels).item()
-            count_total += len(batch)
-    accuracy = count_correct / count_total
+    accuracy = count_correct / len(dataloader.dataset)
     print("accuracy: %.5f" % accuracy)
 
 def main(args):
@@ -78,38 +52,34 @@ def main(args):
         print("%d training samples" % (n_neg + n_pos))
         print("%d test samples" % (len(texts_neg) - n_neg + len(texts_pos) - n_pos))
     
-    # was used for testing on imdb
-    #texts_train, labels_train = read_imdb_split(os.path.join(DIR_DATA, 'aclImdb/train'))
-    #texts_test, labels_test = read_imdb_split(os.path.join(DIR_DATA, 'aclImdb/test'))
-
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
-    tokenizer = BartTokenizer.from_pretrained(args.pretrained_model) 
-
-    # apply tokenizer
-    if args.verbose: print("tokenizing data...")
-    encodings_train = tokenizer(texts_train, truncation=True, padding=True)
-    encodings_test = tokenizer(texts_test, truncation=True, padding=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model) 
+    collate_fn = utils.TextCollator(tokenizer)
     
     # build dataloader
-    ds_train = EncodingsDataset(encodings_train, labels_train) 
-    ds_test = EncodingsDataset(encodings_test, labels_test) 
+    ds_train = utils.TextDataset(texts_train, labels_train) 
+    ds_test = utils.TextDataset(texts_test, labels_test) 
     dl_train = torch.utils.data.DataLoader(
         dataset=ds_train,
         batch_size=args.batch_size//args.accumulation_size,
         shuffle=True,
-        num_workers=4
+        num_workers=4,
+        collate_fn=collate_fn
     )
     dl_test = torch.utils.data.DataLoader(
         dataset=ds_test,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=4,
+        collate_fn=collate_fn
     )
 
     # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = BartForSequenceClassification.from_pretrained(args.pretrained_model)
+    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2)
     model.to(device)
     
     optimizer = AdamW(model.parameters(), lr=5e-5)
@@ -137,11 +107,13 @@ def main(args):
                         (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
                     )
                 avg_loss = 0.0
-        evaluation(args, model, dl_test)
+        evaluation(args, model, dl_test, device)
         # save model parameters to specified file
-        model.module.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % epoch))
+        model.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % (epoch+1)))
 
 if __name__ == "__main__":
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+
     parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
 
     parser.add_argument('neg_data', type=str, 
