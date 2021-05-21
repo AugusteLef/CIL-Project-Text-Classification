@@ -1,3 +1,18 @@
+
+
+## Twitter  Datasets
+
+Download the tweet datasets from here:
+http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datasets.zip
+
+The dataset should have the following files:
+- sample_submission.csv
+- train_neg.txt :  a subset of negative training samples
+- train_pos.txt: a subset of positive training samples
+- test_data.txt:
+- train_neg_full.txt: the full negative training samples
+- train_pos_full.txt: the full positive training samples
+
 ## Build the Co-occurence Matrix
 
 To build a co-occurence matrix, run the following commands.  (Remember to put the data files
@@ -18,8 +33,10 @@ Note that the cooc.py script takes a few minutes to run, and displays the number
 
 ## Virtual Environment & Dependencies
 
-- start virtual environment:
+Start virtual environment:
+```bash
 source venv/bin/activate
+```
 
 - exit virtual environment
 deactivate
@@ -28,7 +45,9 @@ deactivate
 pip list --format=freeze > requirements.txt
 
 - install dependencies (make sure to be in venv):
+```bash
 pip install -r requirements.txt
+```
 
 ## Leonhard Cluster
 
@@ -41,6 +60,9 @@ module load StdEnv
 
 - preloading model:
 python3 preloading.py
+```
+
+### Instructions specific for leonhard
 
 - submitting job:
 bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py [args]

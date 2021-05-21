@@ -1,6 +1,7 @@
 import re
 import sys
 import argparse
+import os
 
 #import wordsegment as ws
 #ws.load()
@@ -40,6 +41,9 @@ def main(args):
         l[i] = preprocess_tweet(l[i])
     
     if args.verbose: print("writing output to %s..." % args.output_path)    
+    dir_out = os.path.dirname(args.output_path)
+    if dir_out != "" and not os.path.exists(dir_out):
+        os.makedirs(dir_out)
     f_out = open(args.output_path, "w")
     f_out.writelines(l)
 
@@ -47,7 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='takes raw data, outputs preprocessed data')
     parser.add_argument('input_path', type=str, help='path to raw data', action='store')
     parser.add_argument('output_path', type=str, help='path where output should be written', action='store')
-    parser.add_argument('-v', '-verbose', dest='verbose', help='want verbose output or not?', action='store_true')
+    parser.add_argument('-v', '--verbose', dest='verbose', help='want verbose output or not?', action='store_true')
     args = parser.parse_args()
     main(args)
 

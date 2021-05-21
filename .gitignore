@@ -5,6 +5,7 @@
 
 # ignore /twitter-datasets repo
 **/twitter-datasets
+
 # everything data related
 Data
 sample_submission.csv
