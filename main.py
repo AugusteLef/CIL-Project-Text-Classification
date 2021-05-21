@@ -149,7 +149,7 @@ if __name__ == "__main__":
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
 
     args = parser.parse_args()
-
+    print(args.epochs)
     torch.manual_seed(args.seed)
     random.seed(args.seed)
 
