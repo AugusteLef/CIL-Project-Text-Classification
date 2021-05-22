@@ -1,0 +1,242 @@
+Sender: LSF System <lsfadmin@eu-ms-005-15>
+Subject: Job 171987245: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:10:54 2021
+Job was executed on host(s) <eu-ms-005-15>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:11:04 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:11:04 2021
+Terminated at Mon May 10 17:11:05 2021
+Results reported at Mon May 10 17:11:05 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   0.12 sec.
+    Max Memory :                                 11 MB
+    Average Memory :                             -
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               8181.00 MB
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   22 sec.
+    Turnaround time :                            11 sec.
+
+The output (if any) follows:
+
+  File "XLNET.py", line 1
+    import numpy==1.18 as np
+                 ^
+SyntaxError: invalid syntax
+Sender: LSF System <lsfadmin@eu-ms-008-38>
+Subject: Job 171987392: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:11:55 2021
+Job was executed on host(s) <eu-ms-008-38>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:12:04 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:12:04 2021
+Terminated at Mon May 10 17:12:06 2021
+Results reported at Mon May 10 17:12:06 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   0.95 sec.
+    Max Memory :                                 95 MB
+    Average Memory :                             -
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               8097.00 MB
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   17 sec.
+    Turnaround time :                            11 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "XLNET.py", line 2, in <module>
+    import pandas as pd
+  File "/cluster/apps/python/3.6.0/x86_64/lib64/python3.6/site-packages/pandas/__init__.py", line 56, in <module>
+    import pandas.util.testing
+  File "/cluster/apps/python/3.6.0/x86_64/lib64/python3.6/site-packages/pandas/util/testing.py", line 22, in <module>
+    from numpy.testing.decorators import slow     # noqa
+ModuleNotFoundError: No module named 'numpy.testing.decorators'
+Sender: LSF System <lsfadmin@eu-a2p-010>
+Subject: Job 171987503: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:12:41 2021
+Job was executed on host(s) <eu-a2p-010>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:13:05 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:13:05 2021
+Terminated at Mon May 10 17:13:08 2021
+Results reported at Mon May 10 17:13:08 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   1.21 sec.
+    Max Memory :                                 95 MB
+    Average Memory :                             67.67 MB
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               8097.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   6 sec.
+    Turnaround time :                            27 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "XLNET.py", line 1, in <module>
+    import pandas as pd
+  File "/cluster/apps/python/3.6.0/x86_64/lib64/python3.6/site-packages/pandas/__init__.py", line 56, in <module>
+    import pandas.util.testing
+  File "/cluster/apps/python/3.6.0/x86_64/lib64/python3.6/site-packages/pandas/util/testing.py", line 22, in <module>
+    from numpy.testing.decorators import slow     # noqa
+ModuleNotFoundError: No module named 'numpy.testing.decorators'
+Sender: LSF System <lsfadmin@eu-ms-009-02>
+Subject: Job 171987992: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:14:04 2021
+Job was executed on host(s) <eu-ms-009-02>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:14:34 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:14:34 2021
+Terminated at Mon May 10 17:14:36 2021
+Results reported at Mon May 10 17:14:36 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   0.61 sec.
+    Max Memory :                                 113 MB
+    Average Memory :                             -
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               8079.00 MB
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   2 sec.
+    Turnaround time :                            32 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "XLNET.py", line 3, in <module>
+    import transformers
+ModuleNotFoundError: No module named 'transformers'
+Sender: LSF System <lsfadmin@eu-a2p-010>
+Subject: Job 171988209: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:15:47 2021
+Job was executed on host(s) <eu-a2p-010>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:16:04 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:16:04 2021
+Terminated at Mon May 10 17:16:09 2021
+Results reported at Mon May 10 17:16:09 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   1.85 sec.
+    Max Memory :                                 287 MB
+    Average Memory :                             198.00 MB
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               7905.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   11 sec.
+    Turnaround time :                            22 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "XLNET.py", line 6, in <module>
+    from transformers import XLNetTokenizer,XLNetForSequenceClassification
+ImportError: cannot import name 'XLNetForSequenceClassification' from 'transformers' (unknown location)
+Sender: LSF System <lsfadmin@eu-ms-025-44>
+Subject: Job 171989643: <python3 XLNET.py> in cluster <euler> Exited
+
+Job <python3 XLNET.py> was submitted from host <eu-login-06> by user <alefevre> in cluster <euler> at Mon May 10 17:22:49 2021
+Job was executed on host(s) <eu-ms-025-44>, in queue <normal.4h>, as user <alefevre> in cluster <euler> at Mon May 10 17:23:05 2021
+</cluster/home/alefevre> was used as the home directory.
+</cluster/home/alefevre> was used as the working directory.
+Started at Mon May 10 17:23:05 2021
+Terminated at Mon May 10 17:23:11 2021
+Results reported at Mon May 10 17:23:11 2021
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python3 XLNET.py
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   1.76 sec.
+    Max Memory :                                 289 MB
+    Average Memory :                             79.00 MB
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               7903.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                4
+    Run time :                                   10 sec.
+    Turnaround time :                            22 sec.
+
+The output (if any) follows:
+
+Traceback (most recent call last):
+  File "XLNET.py", line 6, in <module>
+    from transformers import XLNetTokenizer,XLNetForSequenceClassification
+ImportError: cannot import name 'XLNetForSequenceClassification' from 'transformers' (unknown location)
