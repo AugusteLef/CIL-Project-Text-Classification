@@ -449,18 +449,19 @@ def main(args):
     if args.is_test_set:
         df = data_loading_saving.load_raw_data_testset(args.input_path)
     else:
-        df = data_loading_saving.load_raw_data(args.input_path, args.labels)
+        df = data_loading_saving.load_raw_data_trainingset(args.input_path, args.labels)
     print(len(df))
     if args.verbose: print("basic processing...")
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
     if args.verbose: print("processing: replace contraction...")
     df['tweet'] = df['tweet'].apply(lambda row: replace_contraction(str(row)))
 
-    if args.verbose: print("processing: replace abbreviations...")
-    df['tweet'] = df['tweet'].apply(lambda row: replace_abbreviations(str(row)))
-
     if args.verbose: print("processing: remove punctuation and special characters...")
     df['tweet'] = df['tweet'].apply(lambda row: remove_punctuation(str(row)))
+
+    if args.abbreviations:
+        if args.verbose: print("processing: replace abbreviations...")
+        df['tweet'] = df['tweet'].apply(lambda row: replace_abbreviations(str(row)))
 
     if args.stop_words:
         if args.verbose: print("processing: remove stopwords...")
@@ -480,16 +481,18 @@ def main(args):
     if args.verbose: print("writing output to %s..." % args.output_path)
     dir_out = os.path.dirname(args.output_path)
     if dir_out != "" and os.path.exists(dir_out):
-        data_loading_saving.write_to_text(dir_out, df)
+        data_loading_saving.write_to_text(dir_out +'/'+ args.output_file, df)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='takes raw data, outputs preprocessed data')
     parser.add_argument('input_path', type=str, help='path to raw data', action='store')
     parser.add_argument('output_path', type=str, help='path where output should be written', action='store')
+    parser.add_argument('output_file', type=str, help='file where output should be written', action='store')
     parser.add_argument('is_test_set', type=bool, help='do you preprocess testing set ?', action='store')
     parser.add_argument('labels', type=int, help='0 for negative, 1 for positive, anything else if is_test_set',
                         action='store')
+    parser.add_argument('abbreviations', type=bool, help='do you want to abbreviate tweet', action='store')
     parser.add_argument('stemming', type=bool, help='do you want to stemm tweet', action='store')
     parser.add_argument('lemmatizing', type=bool, help='do you want to lemmatize tweet ?', action='store')
     parser.add_argument('stop_words', type=bool, help='do you to remove stop words?', action='store')
