@@ -73,6 +73,10 @@ def write_to_text(path: str, df: pd.DataFrame) -> None:
         path (str): path to write (file name include)(should end by .txt)
         df (DataFrame): dataframe to save
     """
+<<<<<<< HEAD
+    print(path)
+=======
+>>>>>>> ced9ad7d04f04af8628ffbcf90141542847d2bda
     df.to_csv(path, header=True, index=None, sep=',')
     return
 
