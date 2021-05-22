@@ -11,7 +11,11 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
+
 import data_loading_saving
+import utils
+
+from itertools import groupby
 
 # dowload data
 nltk.download('stopwords')
@@ -440,6 +444,22 @@ def remove_punctuation(tweet: str) -> str:
     tweet = "".join([char for char in tweet if char not in string.punctuation])
     return tweet
 
+
+def split_hashtags(tweet: str) -> str:
+    """ Remove punct and special chars '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+    Args:
+        tweet (string): tweet as string
+
+    Returns:
+        string: tweet without hashtags and splitted
+    """
+    hashtags_list = re.findall(r"#(\w+)", tweet)
+    splits = [None] * len(hashtags_list)
+    for j in range(len(hashtags_list)):
+        splits[j] = utils.segment(hashtags_list[j])
+        tweet = tweet.replace('#' + str(hashtags_list[j]), ' '.join(splits[j][0]))
+    return tweet
 
 def main(args):
     '''
