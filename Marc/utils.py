@@ -4,10 +4,6 @@ import os
 
 cleanup = re.compile(r'[^a-z0-9]')
 
-dict_path = os.path.join(os.path.abspath(''), 'dict.txt')
-dictionary = dict(entry(line) for line in open(dict_path))
-max_word_length = max(map(len, dictionary))
-total = float(sum(dictionary.values()))
 
 
 # http://stackoverflow.com/a/481773/554406
@@ -35,3 +31,7 @@ def entry(line):
   w, c = line.split("\t", 2)
   return (w, int(c))
 
+dict_path = os.path.join(os.path.abspath(''), 'dict.txt')
+dictionary = dict(entry(line) for line in open(dict_path))
+max_word_length = max(map(len, dictionary))
+total = float(sum(dictionary.values()))

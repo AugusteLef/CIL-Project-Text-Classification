@@ -407,7 +407,7 @@ def remove_stop_words(tweet: str) -> str:
     return text
 
 
-def basic_preprocess(tweet: str) -> str:
+def basic_preprocess(tweet: str, first_pass : bool) -> str:
     """Remove numbers, user, url, hastags, excessive whitespaces tags and force to lower case
 
     Args:
@@ -420,7 +420,7 @@ def basic_preprocess(tweet: str) -> str:
     tweet = re.sub('<user>', '', tweet)  # remove user tags
     tweet = re.sub('<url>', '', tweet)  # remove url tags
     tweet = re.sub('[0-9]', '', tweet)  # remove numbers
-    tweet = re.sub('#\w*', '', tweet)  # remove hashtags
+    if not first_pass : tweet = re.sub('#\w*', '', tweet)  # remove hashtags
 
     tweet = re.sub('\s+', ' ', tweet)  # remove excess whitespace
     tweet = re.sub('^\s', '', tweet)  # remove excess whitespace
@@ -472,7 +472,9 @@ def main(args):
         df = data_loading_saving.load_raw_data_trainingset(args.input_path, args.labels)
     print(len(df))
     if args.verbose: print("basic processing...")
-    df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
+    df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row), True))
+    if args.verbose: print("processing: removing # and splitting hashtag text...")
+    df['tweet'] = df['tweet'].apply(lambda row: split_hashtags(str(row)))
     if args.verbose: print("processing: replace contraction...")
     df['tweet'] = df['tweet'].apply(lambda row: replace_contraction(str(row)))
 
@@ -496,18 +498,16 @@ def main(args):
         df['tweet'] = df['tweet'].apply(lambda row: lemmatizing(str(row)))
 
     if args.verbose: print("basic processing... Again...")
-    df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
+    df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row), False))
 
     if args.verbose: print("writing output to %s..." % args.output_path)
-<<<<<<< HEAD
     dir_out = os.path.dirname(args.output_path)
     if dir_out != "" and os.path.exists(dir_out):
         data_loading_saving.write_to_text(dir_out +'/'+ args.output_file, df)
-=======
+
     #dir_out = os.path.dirname(args.output_path)
     #if dir_out != "" and os.path.exists(dir_out):
     data_loading_saving.write_to_text(args.output_path, df)
->>>>>>> ced9ad7d04f04af8628ffbcf90141542847d2bda
 
 
 if __name__ == "__main__":
