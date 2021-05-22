@@ -1,0 +1,15 @@
+Ideas to explore (meeting 22.05.2021)
+
+- Faster Tokenization before training 
+
+- Adapter (multilanguage embedding)
+
+- Dictionary of the wrongly classified tweets (extend)
+
+- Study the differences of wrongly classified tweets between != models
+
+- Clean code (merge main preprocessing etc?)
+
+- Try a submission with ensemble voting with the 3/4 models
+
+- Fix some layers and train/fine-tune the first and last layers (test how many)
