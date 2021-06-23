@@ -19,11 +19,11 @@ venv
 Auguste
 Marc
 
-# everything pretrained models related
-# Pretrained
+# pretrained models (you can load them yourself by running preloading.py)
+Pretrained
 
 # environment helper files
-__pycache__
+**/__pycache__
 
 # Default ignored files
 /shelf/

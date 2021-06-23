@@ -2,14 +2,24 @@ import os
 import torch
 import argparse
 import random
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from transformers import AdamW
 import pandas as pd
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, AdamW
+
+# import custom utils
 import utils
 
-def evaluation(args, model, dataloader, device):
-    # evaluate i.e. generate accuracy estimation
-    if args.verbose: print("evaluation...")
+def evaluation(model, dataloader, device):
+    """ estimate accuracy of model
+
+    Args:
+        args : command line arguments
+        model : model to evaluate
+        dataloader : data to evaluate on
+        device : torch device
+
+    Returns:
+        accuracy of model on given data
+    """
     model.eval()
     count_correct = 0.0
     with torch.no_grad():
@@ -21,9 +31,14 @@ def evaluation(args, model, dataloader, device):
             preds = torch.argmax(outputs[1], dim=1)
             count_correct += torch.sum(preds == labels).item()
     accuracy = count_correct / len(dataloader.dataset)
-    print("accuracy: %.5f" % accuracy)
+    return accuracy
 
 def main(args):
+    """ main training routine
+
+    Args:
+        args: command line arguments containing paths to training data, pretrained model, output location etc.
+    """
     # get the data
     if args.verbose: print("reading data...")
     if args.neg_data[-3:] == "txt":
@@ -81,7 +96,6 @@ def main(args):
     # load pretrained model
     model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2)
     model.to(device)
-    
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
     # train
@@ -107,15 +121,19 @@ def main(args):
                         (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
                     )
                 avg_loss = 0.0
-        evaluation(args, model, dl_test, device)
+        # evaluation
+        if args.verbose: print("evaluation...")
+        print("accuracy: %.5f" % evaluation(model, dl_test, device))
         # save model parameters to specified file
         model.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % (epoch+1)))
 
+# this script executes a full training routine according to command-line arguments
 if __name__ == "__main__":
     os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
-    parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
-
+    parser = argparse.ArgumentParser(description='train pretrained model on data')
+    
+    # command line arguments
     parser.add_argument('neg_data', type=str, 
         help='path to negative training data', action='store')
     parser.add_argument('pos_data', type=str, 
@@ -139,8 +157,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    # set seeds
     torch.manual_seed(args.seed)
     random.seed(args.seed)
 
+    # start training
     main(args)
 

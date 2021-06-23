@@ -26,6 +26,7 @@ Note that the cooc.py script takes a few minutes to run, and displays the number
 ## General Workflow
 
 - apply preprocessing scripts to raw data to build files of preprocessed data
+    - example: python3.7 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt 0 0 0 -v
 - apply training scripts to preprocessed data, save trained model
 - run inference script using a trained model
 

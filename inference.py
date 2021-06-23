@@ -2,11 +2,18 @@ import os
 import torch
 import argparse
 import random
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, BertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
+
+# import custom utils
 import utils
 
 def main(args):
+    """ creates predictions for give data using given model
+
+    Args:
+
+    """
     # get the data
     if args.verbose: print("reading data...")
     df = pd.read_csv(args.path_data, keep_default_na=False)
@@ -31,7 +38,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = BertForSequenceClassification.from_pretrained(args.dir_model)
+    model = AutoModelForSequenceClassification.from_pretrained(args.dir_model)
     model.to(device)
     
     # inference
@@ -53,11 +60,13 @@ def main(args):
     df = pd.DataFrame(results, index=list(range(1, len(results)+1)))
     df.to_csv(args.path_output, header=["Prediction"], index_label="Id")
 
+# creates prediction for given data using given model
 if __name__ == "__main__":
     os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
-    parser = argparse.ArgumentParser(description='train pretrained BERT model on data')
+    parser = argparse.ArgumentParser(description='predict labels with given model')
 
+    # command-line arguments
     parser.add_argument('path_data', type=str, 
         help='path to test data', action='store')
     parser.add_argument('path_output', type=str, 
@@ -69,14 +78,10 @@ if __name__ == "__main__":
     parser.add_argument('-dm', '--dir_model', dest='dir_model', type=str, 
         help='directory containing pretrained model')
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
-        help='size of batches for training', action='store', default=16)
-    parser.add_argument('--seed', dest='seed', type=int, 
-        help='fix random seeds', action='store', default=42)
+        help='size of batches for prediction', action='store', default=16)
 
     args = parser.parse_args()
-
-    torch.manual_seed(args.seed)
-    random.seed(args.seed)
-
+    
+    # predict labels
     main(args)
 
