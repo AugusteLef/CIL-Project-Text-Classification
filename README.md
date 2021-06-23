@@ -23,42 +23,55 @@ Note that the cooc.py script takes a few minutes to run, and displays the number
 - python3 pickle_vocab.py
 - python3 cooc.py
 
-## Instructions
+## General Workflow
+
+- apply preprocessing scripts to raw data to build files of preprocessed data
+- apply training scripts to preprocessed data, save trained model
+- run inference script using a trained model
+
+## Virtual Environment & Dependencies
 
 Start virtual environment:
 ```bash
 source venv/bin/activate
 ```
 
-Install dependencies:
+- exit virtual environment
+deactivate
+
+- list dependencies (update requirements.txt):
+pip list --format=freeze > requirements.txt
+
+- install dependencies (make sure to be in venv):
 ```bash
 pip install -r requirements.txt
 ```
 
-Get Imdb dataset:
-```bash
-wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
-tar -xf aclImdb_v1.tar.gz
-```
+## Leonhard Cluster
 
-Move Imdb dataset to data directory (you will have to adjust DIR_DATA param in main.py if not $SCRATCH):
-```bash
-mv aclImdb $SCRATCH/
-```
+- load modules:
+module load gcc/6.3.0 python_gpu/3.8.5
 
-Preload preprocessed parameters:
-```bash
+- reset modules
+module purge
+module load StdEnv
+
+- preloading model:
 python3 preloading.py
 ```
 
 ### Instructions specific for leonhard
 
-Load modules:
-```bash
-module load gcc/6.3.0 python_gpu/3.8.5
-```
+- submitting job:
+bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py [args]
 
-Submit job:
-```bash
-bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -o output python3 main.py
-```
+- submitting as interactive job for testing (output to terminal):
+bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" python3 main.py [args]
+
+- monitoring job
+bbjobs
+
+## IMDB Dataset on Leonhard
+wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+mv aclImdb $SCRATCH/
+tar -xf aclImdb_v1.tar.gz

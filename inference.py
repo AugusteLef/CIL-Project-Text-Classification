@@ -2,7 +2,7 @@ import os
 import torch
 import argparse
 import random
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, BartForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, BertForSequenceClassification
 import pandas as pd
 import utils
 
@@ -31,7 +31,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = BartForSequenceClassification.from_pretrained(args.dir_model)
+    model = BertForSequenceClassification.from_pretrained(args.dir_model)
     model.to(device)
     
     # inference

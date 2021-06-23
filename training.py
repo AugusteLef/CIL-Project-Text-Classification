@@ -129,9 +129,9 @@ if __name__ == "__main__":
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
         help='number of epochs to train', action='store', default=3)
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
-        help='size of batches for training', action='store', default=16)
+        help='size of batches for training', action='store', default=32)
     parser.add_argument('-as', '--accumulation_size', dest='accumulation_size', type=int, 
-        help='reduces memory usage, if larger', action='store', default=16)
+        help='reduces memory usage, if larger', action='store', default=4)
     parser.add_argument('--seed', dest='seed', type=int, 
         help='fix random seeds', action='store', default=42)
     parser.add_argument('--split', dest='split', type=float, 
