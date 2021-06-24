@@ -11,22 +11,10 @@ The dataset should have the following files:
 - train_neg_full.txt: the full negative training samples
 - train_pos_full.txt: the full positive training samples
 
-## Build the Co-occurence Matrix
-
-To build a co-occurence matrix, run the following commands.  (Remember to put the data files
-in the correct locations)
-
-Note that the cooc.py script takes a few minutes to run, and displays the number of tweets processed.
-
-- build_vocab.sh
-- cut_vocab.sh
-- python3 pickle_vocab.py
-- python3 cooc.py
-
 ## General Workflow
 
 - apply preprocessing scripts to raw data to build files of preprocessed data
-    - example: python3.7 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt 0 0 0 -v
+    - example: python3.7 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
 - apply training scripts to preprocessed data, save trained model
 - run inference script using a trained model
 
@@ -59,7 +47,7 @@ module load StdEnv
 
 - preloading model:
 python3 preloading.py
-```
+
 
 ### Instructions specific for leonhard
 

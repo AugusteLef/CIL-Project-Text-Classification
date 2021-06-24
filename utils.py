@@ -8,7 +8,7 @@ def load_raw_data(path: str) -> pd.DataFrame:
         path (str): The path of the file (.txt) to load tweets from
 
     Returns:
-        DataFrame: a Dataframe with each tweet from path and its label
+        DataFrame: a Dataframe with one row per tweet
     """
     data = []
     with open(path) as file:
@@ -16,44 +16,10 @@ def load_raw_data(path: str) -> pd.DataFrame:
             data.append(line)
     data_df = pd.DataFrame(data, columns = {'tweet'})
     return data_df
-
-def load_dataframe(path: str) -> pd.DataFrame:
-    """Load a dataframe containing tweet and labels
-
-    Args:
-        path (str): path to the dataframe (.txt)
-
-    Returns:
-        DataFrame: the loaded dataframe
-    """
-    df = pd.read_csv(path, sep = ',')
-    return df
-
-def concat_DataFrame(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
-    """Concatenate 2 Dataframes
-
-    Args:
-        df1 (DataFrame): first data frame
-        df2 (DataFrame): 2nd data frame
-
-    Returns:
-        DataFrame: concatenation of dset1 and dset2
-    """
-    df = pd.concat([df1, df2])
-    return df
-
-def shuffle_df(df: pd.DataFrame) -> pd.DataFrame:
-    """shuffle a DataFrame
-
-    Args:
-        df (DataFrame): DataFram to shuffle
-
-    Returns:
-        DataFrame: DataFrame shuffled
-    """
-    return df.sample(frac=1)
     
 class TextDataset(torch.utils.data.Dataset):
+    """ torch-dataset used in training and prediction
+    """
     def __init__(self, texts, labels=None):
         self.texts = texts
         self.labels = labels
@@ -68,15 +34,42 @@ class TextDataset(torch.utils.data.Dataset):
             return (self.texts[idx],)
 
 class TextCollator():
+    """ text-collater used in training and prediction
+    """
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
     def __call__(self, list_items):
+        # extract only tweets, tokenize them
         texts = [item[0] for item in list_items]
         batch = self.tokenizer(texts, truncation=True, padding=True)
+        # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
             labels = [item[1] for item in list_items]
             batch["labels"] = labels
         batch = {key: torch.tensor(val) for key, val in batch.items()}
         return batch
 
+def evaluation(model, dataloader, device):
+    """ estimate accuracy of model
+
+    Args:
+        model : model to evaluate
+        dataloader : data to evaluate on
+        device : torch device
+
+    Returns:
+        accuracy of model on given data
+    """
+    model.eval()
+    count_correct = 0.0
+    with torch.no_grad():
+        for i, batch in enumerate(dataloader):
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            labels = batch['labels'].to(device)
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+            preds = torch.argmax(outputs[1], dim=1)
+            count_correct += torch.sum(preds == labels).item()
+    accuracy = count_correct / len(dataloader.dataset)
+    return accuracy

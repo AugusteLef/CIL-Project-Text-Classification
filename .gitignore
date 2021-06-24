@@ -20,7 +20,7 @@ Auguste
 Marc
 
 # pretrained models (you can load them yourself by running preloading.py)
-Pretrained
+Pretrained_Models
 
 # environment helper files
 **/__pycache__

@@ -49,6 +49,7 @@ readline=8.1=h9ed2024_0
 regex=2021.4.4=py37h9ed2024_0
 requests=2.25.1=pyhd3eb1b0_0
 sacremoses=master=py_0
+sentencepiece=0.1.96=pypi_0
 setuptools=52.0.0=py37hecd8cb5_0
 six=1.15.0=py37hecd8cb5_0
 soupsieve=2.2.1=pyhd3eb1b0_0

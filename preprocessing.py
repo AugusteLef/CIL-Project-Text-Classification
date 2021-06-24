@@ -202,16 +202,16 @@ def main(args):
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
     # writing output
     if args.verbose: print("writing output to %s..." % args.output_path)
-    df.to_csv(args.output_path, header=True, index=None, sep=',')
+    df.to_csv(args.output_path, header=False, index=None, sep=',')
 
 # running this file from command-line will do a full preprocessing pass on specified data
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='takes raw data, outputs preprocessed data')
     parser.add_argument('input_path', type=str, help='path to raw data', action='store')
     parser.add_argument('output_path', type=str, help='path where output should be written', action='store')
-    parser.add_argument('stemming', type=bool, help='do you want to stemm tweet', action='store')
-    parser.add_argument('lemmatizing', type=bool, help='do you want to lemmatize tweet ?', action='store')
-    parser.add_argument('stop_words', type=bool, help='do you to remove stop words?', action='store')
+    parser.add_argument('-s', '--stemming', dest='stemming', help='do you want to stemm tweet?', action='store_true')
+    parser.add_argument('-l', '--lemmatizing', dest='lemmatizing', help='do you want to lemmatize tweet?', action='store_true')
+    parser.add_argument('-sw', '--stop_words', dest='stop_words', help='do you to remove stop words?', action='store_true')
     parser.add_argument('-v', '--verbose', dest='verbose', help='want verbose output or not?', action='store_true')
     args = parser.parse_args()
     main(args)

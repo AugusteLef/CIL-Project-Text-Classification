@@ -8,31 +8,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Adam
 # import custom utils
 import utils
 
-def evaluation(model, dataloader, device):
-    """ estimate accuracy of model
-
-    Args:
-        args : command line arguments
-        model : model to evaluate
-        dataloader : data to evaluate on
-        device : torch device
-
-    Returns:
-        accuracy of model on given data
-    """
-    model.eval()
-    count_correct = 0.0
-    with torch.no_grad():
-        for i, batch in enumerate(dataloader):
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            labels = batch['labels'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            preds = torch.argmax(outputs[1], dim=1)
-            count_correct += torch.sum(preds == labels).item()
-    accuracy = count_correct / len(dataloader.dataset)
-    return accuracy
-
 def main(args):
     """ main training routine
 
@@ -94,7 +69,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2)
+    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model) # what was the argument num_labels=2 ?
     model.to(device)
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
@@ -123,13 +98,13 @@ def main(args):
                 avg_loss = 0.0
         # evaluation
         if args.verbose: print("evaluation...")
-        print("accuracy: %.5f" % evaluation(model, dl_test, device))
+        print("accuracy: %.5f" % utils.evaluation(model, dl_test, device))
         # save model parameters to specified file
         model.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % (epoch+1)))
 
 # this script executes a full training routine according to command-line arguments
 if __name__ == "__main__":
-    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+    #  os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
     parser = argparse.ArgumentParser(description='train pretrained model on data')
     
@@ -138,10 +113,10 @@ if __name__ == "__main__":
         help='path to negative training data', action='store')
     parser.add_argument('pos_data', type=str, 
         help='path to positive training data', action='store')
-    parser.add_argument('-pm', '--pretrained_model', dest='pretrained_model', type=str, 
-        help='path to pretrained model that should be used', default='Pretrained/bart-base')
     parser.add_argument('model_destination', type=str, 
         help='path where model should be store', action='store')
+    parser.add_argument('-pm', '--pretrained_model', dest='pretrained_model', type=str, 
+        help='path to pretrained model that should be used', default='Pretrained_Models/bart-base')
     parser.add_argument('-v', '--verbose', dest='verbose', 
         help='want verbose output or not?', action='store_true')
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
