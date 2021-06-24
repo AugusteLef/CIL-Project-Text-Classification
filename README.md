@@ -1,8 +1,9 @@
-## Twitter  Datasets
+## Dataset
 
-Download the tweet datasets from here:
-http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datasets.zip
-
+Download the tweet dataset:
+```
+wget http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datasets.zip
+```
 The dataset should have the following files:
 - sample_submission.csv
 - train_neg.txt :  a subset of negative training samples
@@ -13,10 +14,26 @@ The dataset should have the following files:
 
 ## General Workflow
 
-- apply preprocessing scripts to raw data to build files of preprocessed data
-    - example: python3.7 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
-- apply training scripts to preprocessed data, save trained model
-- run inference script using a trained model
+Download and store pretrained models from huggingface:
+```
+python3 preloading.py
+```
+Apply preprocessing scripts to raw data to build files of preprocessed data:
+```
+python3 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
+
+python3 preprocessing.py Data/train_neg.txt Data/train_neg_basic.txt -v
+```
+Train on preprocessed data and save trained model:
+```
+python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bart-base -pm Pretrained_Models/bart-base/ -v
+
+python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bert-base-uncased -pm Pretrained_Models/bart-base-uncased/ -v
+```
+Create predictions for test-data:
+```
+python inference.py ....
+```
 
 ## Virtual Environment & Dependencies
 
@@ -25,42 +42,46 @@ Start virtual environment:
 source venv/bin/activate
 ```
 
-- exit virtual environment
+Exit virtual environment:
+```
 deactivate
-
-- list dependencies (update requirements.txt):
+```
+Update requirements.txt:
+```
 pip list --format=freeze > requirements.txt
-
-- install dependencies (make sure to be in venv):
+```
+Install dependencies (make sure to be in venv):
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Leonhard Cluster
 
-- load modules:
+Load modules:
+```
 module load gcc/6.3.0 python_gpu/3.8.5
-
-- reset modules
+```
+Reset modules:
+```
 module purge
 module load StdEnv
-
-- preloading model:
-python3 preloading.py
-
-
-### Instructions specific for leonhard
-
-- submitting job:
+```
+Submitting job:
+```
 bsub -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -oo output python3 main.py [args]
-
-- submitting as interactive job for testing (output to terminal):
+```
+Submitting as interactive job for testing (output to terminal):
+```
 bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" python3 main.py [args]
-
-- monitoring job
+```
+Monitoring job:
+```
 bbjobs
+```
 
-## IMDB Dataset on Leonhard
+## IMDB Dataset on Leonhard
+```
 wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
 mv aclImdb $SCRATCH/
 tar -xf aclImdb_v1.tar.gz
+```

@@ -29,6 +29,11 @@ def main(args):
         df_pos = pd.read_csv(args.pos_data, keep_default_na=False)
         texts_pos = list(df_pos["tweet"])
 
+    # XLNET need sep and cls tags at the end of each tweet
+    if args.XLNET:
+        texts_pos = utils.XLNET_tweets_transformation(texts_pos)
+        texts_neg = utils.XLNET_tweets_transformation(texts_neg)
+
     # create train / test split
     n_neg = int(args.split*len(texts_neg))
     n_pos = int(args.split*len(texts_pos))
@@ -104,7 +109,7 @@ def main(args):
 
 # this script executes a full training routine according to command-line arguments
 if __name__ == "__main__":
-    #  os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
     parser = argparse.ArgumentParser(description='train pretrained model on data')
     
@@ -129,7 +134,8 @@ if __name__ == "__main__":
         help='fix random seeds', action='store', default=42)
     parser.add_argument('--split', dest='split', type=float, 
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
-
+    parser.add_argument('-x', '--XLNET', dest='XLNET', 
+        help='must set this flag when using XLNET', action='store_true')
     args = parser.parse_args()
 
     # set seeds

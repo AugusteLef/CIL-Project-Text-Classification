@@ -17,6 +17,22 @@ def load_raw_data(path: str) -> pd.DataFrame:
     data_df = pd.DataFrame(data, columns = {'tweet'})
     return data_df
     
+#
+def XLNET_tweets_transformation(df):
+    """ XLNET need sep and cls tags at the end of each tweet
+
+    Args:
+        list of tweets
+
+    Returns: 
+        list of processed tweets
+    """
+    tweets = []
+    for tweet in df['tweet']:
+        tweet = tweet+'[SEP] [CLS]'
+        tweets.append(tweet)
+    return tweets
+
 class TextDataset(torch.utils.data.Dataset):
     """ torch-dataset used in training and prediction
     """

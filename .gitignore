@@ -19,8 +19,9 @@ venv
 Auguste
 Marc
 
-# pretrained models (you can load them yourself by running preloading.py)
+# all models
 Pretrained_Models
+Models
 
 # environment helper files
 **/__pycache__
