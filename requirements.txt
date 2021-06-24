@@ -27,7 +27,7 @@ regex==2021.4.4
 requests==2.25.1
 sacremoses==0.0.43
 sentencepiece==0.1.96
-setuptools==52.0.0.post20210125
+setuptools
 six==1.15.0
 soupsieve==2.2.1
 tokenizers==0.10.2
