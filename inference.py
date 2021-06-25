@@ -82,6 +82,8 @@ if __name__ == "__main__":
         help='want verbose output or not?', action='store_true')
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=16)
+    parser.add_argument('-x', '--XLNET', dest='XLNET', 
+        help='must set this flag when using XLNET', action='store_true')
 
     args = parser.parse_args()
     
