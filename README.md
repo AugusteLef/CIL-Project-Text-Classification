@@ -6,6 +6,8 @@ wget http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datas
 
 unzip twitter-datasets.zip
 
+mkdir Data
+
 mv twitter-datasets/* Data
 ```
 The dataset should have the following files:
