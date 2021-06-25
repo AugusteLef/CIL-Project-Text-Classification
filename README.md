@@ -1,16 +1,35 @@
+## File Structure
+Some scripts may assume the following file-structure:
+- Data : Directory containing all training-, test- and preprocessed data
+- Models : Directory containing all fine-tuned models that we use for prediction.
+- Predictions : Directory containing all predictions for test-set.
+- Preprocessing_Data : Directory containing wordlists and other data used for preprocessing.
+- Pretrained_Models : Directory containing pretrained models downloaded form huggingface.
+- Vocab : Directory containing vocab artefacts.
+
+The following scripts should be contained in the main project folder:
+- preloading.py : Downloads models from huggingface and data for ntkl library.
+- preprocessing.py : Used for preprocessing data-sets with different preprocessing methods.
+- training.py : Used to fine-tune a pretrained model on preprocessed datasets.
+- inference.py : Used to create predictions for test-set using a fine-tuned model.
+- utils.py : Contains some useful code-snippets used in the above scripts.
+
+
 ## Dataset
 
 Download the tweet dataset:
 ```
 wget http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datasets.zip
-
+```
+Move it to the Data directory:
+```
 unzip twitter-datasets.zip
 
 mkdir Data
 
 mv twitter-datasets/* Data
 ```
-The dataset should have the following files:
+The dataset should contain the following files:
 - sample_submission.csv
 - train_neg.txt :  a subset of negative training samples
 - train_pos.txt: a subset of positive training samples
@@ -20,7 +39,7 @@ The dataset should have the following files:
 
 ## General Workflow
 
-Download and store pretrained models from huggingface (run this on login node!):
+Download and store pretrained models from huggingface & nltk data (run this on login node!):
 ```
 python3 preloading.py
 ```
