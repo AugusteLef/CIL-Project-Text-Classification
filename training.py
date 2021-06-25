@@ -14,7 +14,7 @@ def main(args):
     Args:
         args: command line arguments containing paths to training data, pretrained model, output location etc.
     """
-    # get the data
+    # get the data (can also handle csv with explicit labels)
     if args.verbose: print("reading data...")
     if args.neg_data[-3:] == "txt":
         f_neg = open(args.neg_data)

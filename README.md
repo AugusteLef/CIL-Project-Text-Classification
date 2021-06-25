@@ -8,7 +8,7 @@ Some scripts may assume the following file-structure:
 - Vocab : Directory containing vocab artefacts.
 
 The following scripts should be contained in the main project folder:
-- preloading.py : Downloads models from huggingface and data for ntkl library.
+- preloading.py : Downloads models from huggingface and data for nltk library.
 - preprocessing.py : Used for preprocessing data-sets with different preprocessing methods.
 - training.py : Used to fine-tune a pretrained model on preprocessed datasets.
 - inference.py : Used to create predictions for test-set using a fine-tuned model.
