@@ -15,8 +15,8 @@ def main(args):
     """
     # get the data
     if args.verbose: print("reading data...")
-    df = pd.read_csv(args.path_data, keep_default_na=False)
-    texts = list(df["tweet"])
+    tweets = open(args.path_data)
+    texts = tweets.readlines()
 
     # XLNET need sep and cls tags at the end of each tweet
     if args.XLNET:
