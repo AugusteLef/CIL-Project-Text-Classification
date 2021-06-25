@@ -2,11 +2,7 @@
 import argparse
 import re
 import string
-import requests
 import json
-import bs4
-import nltk
-import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -16,33 +12,12 @@ from nltk.tokenize import TweetTokenizer
 # import custom utils
 import utils
 
-# download data needed from nltk
-# nltk.download('punkt')
-# nltk.download('wordnet')
-# nltk.download('stopwords')
+# load wordlists into global variables
 STOP_WORDS = set(stopwords.words('english'))
 with open('Preprocessing_Data/contractions.json', 'r') as file:
     CONTRACTIONS = json.load(file)
 with open('Preprocessing_Data/abbreviations.json', 'r') as file:
     ABBREVIATIONS = json.load(file)
-
-def get_slang():
-    """ download and store slang
-    """
-    resp = requests.get("http://www.netlingo.com/acronyms.php")
-    soup = bs4.BeautifulSoup(resp.text, "html.parser")
-    slangdict = {}
-    key = ""
-    value = ""
-    for div in soup.findAll('div', attrs={'class': 'list_box3'}):
-        for li in div.findAll('li'):
-            for a in li.findAll('a'):
-                key = a.text
-                value = li.text.split(key)[1]
-                slangdict[key] = value
-    # store in json format
-    with open('Preprocessing_Data/myslang.json', 'w') as f:
-        json.dump(slangdict, f, indent=2)
 
 def replace_contractions(tweet: str):
     """ Replace contraction in a text

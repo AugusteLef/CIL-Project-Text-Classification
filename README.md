@@ -18,23 +18,23 @@ The dataset should have the following files:
 
 ## General Workflow
 
-Download and store pretrained models from huggingface:
+Download and store pretrained models from huggingface (run this on login node!):
 ```
 python3 preloading.py
 ```
-Apply preprocessing scripts to raw data to build files of preprocessed data:
+Apply preprocessing scripts to raw data to build files of preprocessed data (on compute node):
 ```
 python3 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
 
 python3 preprocessing.py Data/train_neg.txt Data/train_neg_basic.txt -v
 ```
-Train on preprocessed data and save trained model:
+Train on preprocessed data and save trained model (compute node):
 ```
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bart-base -pm Pretrained_Models/bart-base/ -v
 
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bert-base-uncased -pm Pretrained_Models/bart-base-uncased/ -v
 ```
-Create predictions for test-data:
+Create predictions for test-data (compute node):
 ```
 python inference.py ....
 ```

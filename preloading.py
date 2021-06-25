@@ -18,3 +18,28 @@ model = XLNetForSequenceClassification.from_pretrained('xlnet-base-cased')
 tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
 tokenizer.save_pretrained('Pretrained_Models/xlnet-base-cased')
 model.save_pretrained('Pretrained_Models/xlnet-base-cased')
+
+# nltk data
+import nltk
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+
+# slang json
+import requests
+import json
+import bs4
+resp = requests.get("http://www.netlingo.com/acronyms.php")
+soup = bs4.BeautifulSoup(resp.text, "html.parser")
+slangdict = {}
+key = ""
+value = ""
+for div in soup.findAll('div', attrs={'class': 'list_box3'}):
+    for li in div.findAll('li'):
+        for a in li.findAll('a'):
+            key = a.text
+            value = li.text.split(key)[1]
+            slangdict[key] = value
+# store in json format
+with open('Preprocessing_Data/myslang.json', 'w') as f:
+    json.dump(slangdict, f, indent=2)
