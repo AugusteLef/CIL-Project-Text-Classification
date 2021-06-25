@@ -1,7 +1,6 @@
 import os
 import torch
 import argparse
-import random
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
@@ -18,6 +17,10 @@ def main(args):
     if args.verbose: print("reading data...")
     df = pd.read_csv(args.path_data, keep_default_na=False)
     texts = list(df["tweet"])
+
+    # XLNET need sep and cls tags at the end of each tweet
+    if args.XLNET:
+        texts = utils.XLNET_tweets_transformation(texts)
     
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
@@ -71,12 +74,12 @@ if __name__ == "__main__":
         help='path to test data', action='store')
     parser.add_argument('path_output', type=str, 
         help='path to write output to', action='store')
+    parser.add_argument('-dt', '--dir_tokenizer', dest='dir_tokenizer', type=str, 
+        help='directory containing tokenizer')
+    parser.add_argument('-dm', '--dir_model', dest='dir_model', type=str, 
+        help='directory containing model')
     parser.add_argument('-v', '--verbose', dest='verbose', 
         help='want verbose output or not?', action='store_true')
-    parser.add_argument('-dt', '--dir_tokenizer', dest='dir_tokenizer', type=str, 
-        help='directory containing pretrained tokenizer')
-    parser.add_argument('-dm', '--dir_model', dest='dir_model', type=str, 
-        help='directory containing pretrained model')
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=16)
 

@@ -17,9 +17,8 @@ def load_raw_data(path: str) -> pd.DataFrame:
     data_df = pd.DataFrame(data, columns = {'tweet'})
     return data_df
     
-#
 def XLNET_tweets_transformation(tweets):
-    """ XLNET need sep and cls tags at the end of each tweet
+    """ XLNET needs sep and cls tags at the end of each tweet
 
     Args:
         list of tweets
