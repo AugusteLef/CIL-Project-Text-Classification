@@ -1,12 +1,37 @@
-twitter-datasets
+# everything data related
+Data
+sample_submission.csv
+**/twitter-datasets
+
+# all models
+Pretrained_Models
+Models
+
+# output files
+Output
+
+# hide individual venv files
+environment.yml
+.idea
+venv
+**/__pycache__
+
+# and individual folders
+Auguste
+Marc
 
 # MacOS
 .DS_Store
 .AppleDouble
 .LSOverride
 
-# ignore /twitter-datasets repo
-**/twitter-datasets
+# Default ignored files
+/shelf/
+/workspace.xml
 
-# hide conda environment file (if someone else is using conda we could also consider sharing this file)
-environment.yml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Editor-based HTTP Client requests
+/httpRequests/
