@@ -3,6 +3,10 @@
 Download the tweet dataset:
 ```
 wget http://www.da.inf.ethz.ch/teaching/2018/CIL/material/exercise/twitter-datasets.zip
+
+unzip twitter-datasets.zip
+
+mv twitter-datasets/* Data
 ```
 The dataset should have the following files:
 - sample_submission.csv
@@ -82,6 +86,8 @@ bbjobs
 ## IMDB Dataset on Leonhard
 ```
 wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+
 mv aclImdb $SCRATCH/
+
 tar -xf aclImdb_v1.tar.gz
 ```

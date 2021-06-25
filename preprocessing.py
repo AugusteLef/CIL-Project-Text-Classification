@@ -17,9 +17,9 @@ from nltk.tokenize import TweetTokenizer
 import utils
 
 # download data needed from nltk
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('stopwords')
 STOP_WORDS = set(stopwords.words('english'))
 with open('Preprocessing_Data/contractions.json', 'r') as file:
     CONTRACTIONS = json.load(file)

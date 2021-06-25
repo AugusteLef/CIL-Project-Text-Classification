@@ -29,7 +29,7 @@ def XLNET_tweets_transformation(tweets):
     """
     out = []
     for tweet in tweets:
-        tweet = tweet+'[SEP] [CLS]'
+        tweet = tweet + '[SEP] [CLS]'
         out.append(tweet)
     return out
 

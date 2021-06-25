@@ -9,10 +9,10 @@ import pandas as pd
 import utils
 
 def main(args):
-    """ creates predictions for give data using given model
+    """ creates predictions for given data using given model
 
     Args:
-
+        command-line arguments containing path to model, data etc.
     """
     # get the data
     if args.verbose: print("reading data...")
