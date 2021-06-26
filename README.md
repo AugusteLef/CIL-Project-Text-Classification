@@ -86,7 +86,7 @@ pip install -r requirements.txt
 
 Load modules:
 ```
-module load gcc/6.3.0 python_gpu/3.8.5
+module load gcc/6.3.0 python_gpu/3.8.5 eth_proxy
 ```
 Reset modules:
 ```

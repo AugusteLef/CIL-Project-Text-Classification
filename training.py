@@ -109,7 +109,7 @@ def main(args):
 
 # this script executes a full training routine according to command-line arguments
 if __name__ == "__main__":
-    # os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
     parser = argparse.ArgumentParser(description='train pretrained model on data')
     
