@@ -59,7 +59,11 @@ python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/xln
 ```
 Create predictions for test-data (compute node):
 ```
-python inference.py ....
+python3 inference.py Data/test_data_basic.txt Predictions/bart-base_basic.csv -dt Pretrained_Models/bart-base/ -dm Models/bart-base_basic/checkpoint_3 
+
+python3 inference.py Data/test_data_basic.txt Predictions/bert-base-uncased_basic.csv -dt Pretrained_Models/bert-base-uncased/ -dm Models/bert-base-uncased_basic/checkpoint_3 
+
+python3 inference.py Data/test_data_basic.txt Predictions/xlnet-base-cased_basic.csv -dt Pretrained_Models/xlnet-base-cased/ -dm Models/xlnet-base-cased_basic/checkpoint_3 -x
 ```
 
 ## Virtual Environment & Dependencies
