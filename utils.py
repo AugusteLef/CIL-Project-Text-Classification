@@ -51,15 +51,18 @@ class TextDataset(torch.utils.data.Dataset):
 class TextCollator():
     """ text-collater used in training and prediction
     """
-    def __init__(self, tokenizer):
+    def __init__(self, tokenizer, xlnet=False):
         self.tokenizer = tokenizer
+        self.xlnet = xlnet
 
-    def __call__(self, list_items, xlnet=False):
+    def __call__(self, list_items):
         # extract only tweets, tokenize them
         texts = [item[0] for item in list_items]
-        batch = self.tokenizer(texts, truncation=True, padding=True)
-        if xlnet:
+        batch = 0 # TODO: is this variable declaration needed?
+        if self.xlnet:
             batch = self.tokenizer(texts, truncation=True, padding=True, max_length=140)
+        else:
+            batch = self.tokenizer(texts, truncation=True, padding=True)
         # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
             labels = [item[1] for item in list_items]
