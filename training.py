@@ -76,7 +76,9 @@ def main(args):
     # load pretrained model
     model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2) # what was the argument num_labels=2 ?
     model.to(device)
+    
     optimizer = AdamW(model.parameters(), lr=5e-5)
+    scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
 
     # train
     if args.verbose: print("training...")
@@ -87,13 +89,15 @@ def main(args):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs[0]
-            loss /= args.accumulation_size
-            loss.backward()
+            with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                loss = outputs[0]
+                loss /= args.accumulation_size
+            scaler.scale(loss).backward()
             avg_loss += loss.item()
             if (i + 1) % args.accumulation_size == 0:
-                optimizer.step()
+                scaler.step(optimizer)
+                scaler.update()
                 optimizer.zero_grad() 
                 if args.verbose:
                     print(
@@ -136,6 +140,8 @@ if __name__ == "__main__":
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
     parser.add_argument('-x', '--XLNET', dest='XLNET', 
         help='must set this flag when using XLNET', action='store_true')
+    parser.add_argument('-mp', '--mixed_precision', dest='mixed_precision',
+        help='set to enable mixed precision training', action='store_true', default=False)
     args = parser.parse_args()
 
     # set seeds
