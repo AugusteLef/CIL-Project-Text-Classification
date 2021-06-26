@@ -54,10 +54,12 @@ class TextCollator():
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
-    def __call__(self, list_items):
+    def __call__(self, list_items, xlnet=False):
         # extract only tweets, tokenize them
         texts = [item[0] for item in list_items]
         batch = self.tokenizer(texts, truncation=True, padding=True)
+        if xlnet:
+            batch = self.tokenizer(texts, truncation=True, padding=True, max_length=140)
         # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
             labels = [item[1] for item in list_items]
