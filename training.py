@@ -57,7 +57,7 @@ def main(args):
     ds_test = utils.TextDataset(texts_test, labels_test) 
     dl_train = torch.utils.data.DataLoader(
         dataset=ds_train,
-        batch_size=args.batch_size//args.accumulation_size,
+        batch_size=args.batch_size,
         shuffle=True,
         num_workers=4,
         collate_fn=collate_fn
@@ -74,7 +74,7 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model) # what was the argument num_labels=2 ?
+    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2) # what was the argument num_labels=2 ?
     model.to(device)
     optimizer = AdamW(model.parameters(), lr=5e-5)
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
         help='number of epochs to train', action='store', default=3)
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
-        help='size of batches for training', action='store', default=32)
+        help='size of batches for training', action='store', default=8)
     parser.add_argument('-as', '--accumulation_size', dest='accumulation_size', type=int, 
         help='reduces memory usage, if larger', action='store', default=4)
     parser.add_argument('--seed', dest='seed', type=int, 
