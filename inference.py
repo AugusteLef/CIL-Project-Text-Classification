@@ -33,7 +33,7 @@ def main(args):
         dataset=ds,
         batch_size=args.batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=2,
         collate_fn=collate_fn
         )
 
