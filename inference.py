@@ -25,7 +25,7 @@ def main(args):
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(args.dir_tokenizer) 
-    collate_fn = utils.TextCollator(tokenizer)
+    collate_fn = utils.TextCollator(tokenizer, xlnet=args.XLNET)
 
     # build dataloader
     ds = utils.TextDataset(texts) 
