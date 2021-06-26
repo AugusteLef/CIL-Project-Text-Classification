@@ -3,6 +3,10 @@ Data
 sample_submission.csv
 **/twitter-datasets
 
+# environments
+*venv*
+.*venv*
+
 # all models
 Pretrained_Models
 Models
