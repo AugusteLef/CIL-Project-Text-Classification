@@ -57,7 +57,7 @@ def main(args):
     ds_test = utils.TextDataset(texts_test, labels_test) 
     dl_train = torch.utils.data.DataLoader(
         dataset=ds_train,
-        batch_size=args.batch_size//args.accumulation_size,
+        batch_size=args.batch_size,
         shuffle=True,
         num_workers=4,
         collate_fn=collate_fn
@@ -74,9 +74,11 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # load pretrained model
-    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model) # what was the argument num_labels=2 ?
+    model = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2) # what was the argument num_labels=2 ?
     model.to(device)
+    
     optimizer = AdamW(model.parameters(), lr=5e-5)
+    scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
 
     # train
     if args.verbose: print("training...")
@@ -87,13 +89,15 @@ def main(args):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            loss = outputs[0]
-            loss /= args.accumulation_size
-            loss.backward()
+            with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+                outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+                loss = outputs[0]
+                loss /= args.accumulation_size
+            scaler.scale(loss).backward()
             avg_loss += loss.item()
             if (i + 1) % args.accumulation_size == 0:
-                optimizer.step()
+                scaler.step(optimizer)
+                scaler.update()
                 optimizer.zero_grad() 
                 if args.verbose:
                     print(
@@ -109,7 +113,7 @@ def main(args):
 
 # this script executes a full training routine according to command-line arguments
 if __name__ == "__main__":
-    # os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
     parser = argparse.ArgumentParser(description='train pretrained model on data')
     
@@ -127,7 +131,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
         help='number of epochs to train', action='store', default=3)
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
-        help='size of batches for training', action='store', default=32)
+        help='size of batches for training', action='store', default=8)
     parser.add_argument('-as', '--accumulation_size', dest='accumulation_size', type=int, 
         help='reduces memory usage, if larger', action='store', default=4)
     parser.add_argument('--seed', dest='seed', type=int, 
@@ -136,6 +140,8 @@ if __name__ == "__main__":
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
     parser.add_argument('-x', '--XLNET', dest='XLNET', 
         help='must set this flag when using XLNET', action='store_true')
+    parser.add_argument('-mp', '--mixed_precision', dest='mixed_precision',
+        help='set to enable mixed precision training', action='store_true', default=False)
     args = parser.parse_args()
 
     # set seeds
