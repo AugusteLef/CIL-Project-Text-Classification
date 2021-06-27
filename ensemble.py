@@ -124,6 +124,31 @@ def move_to_device(x, device):
             x[idx] = move_to_device(x[idx], device)
     return x
 
+def evaluation(model, dataloader, device):
+    """ estimate accuracy of model
+
+    Args:
+        model : model to evaluate
+        dataloader : data to evaluate on
+        device : torch device
+
+    Returns:
+        accuracy of model on given data
+    """
+    model.eval()
+    count_correct = 0.0
+    with torch.no_grad():
+        for i, batch in enumerate(dataloader):
+            inputs = batch["inputs"]
+            labels = batch["labels"]
+            inputs = move_to_device(inputs, device)
+            labels = move_to_device(labels, device)
+            logits = model(inputs)
+            preds = torch.argmax(logits, dim=1)
+            count_correct += torch.sum(preds == labels).item()
+    accuracy = count_correct / len(dataloader.dataset)
+    return accuracy
+
 def train(model, dl_train, dl_test, fn_loss, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -158,7 +183,7 @@ def train(model, dl_train, dl_test, fn_loss, args):
                 avg_loss = 0.0
         # evaluation
         if args.verbose: print("evaluation...")
-        print("accuracy: %.5f" % utils.evaluation(model, dl_test, device))
+        print("accuracy: %.5f" % evaluation(model, dl_test, device))
         # save model parameters to specified file
         model.save_pretrained(os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1)))
    
