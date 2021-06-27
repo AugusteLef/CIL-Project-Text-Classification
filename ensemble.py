@@ -7,15 +7,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Adam
 
 import utils
 
-class EnsembleTokenizer():
-    def __init__(self, list_tokenizers):
-        self.list_tokenizers = list_tokenizers
-
-    def __call__(self, batch, truncation=True, padding=True):
-        apply_tokenizer = lambda t: t(batch, truncation=truncation, padding=padding)
-        list_batches = list(map(apply_tokenizer, self.list_tokenizers))
-        return list_batches
-
 class EnsembleModel(torch.nn.Module):
     def __init__(self, list_models):
         super(EnsembleModel, self).__init__()
@@ -24,13 +15,16 @@ class EnsembleModel(torch.nn.Module):
             in_features=2*len(list_models),
             out_features=2,
         )
-        self.layer_softmax = torch.nn.Softmax()
     
     def forward(self, x):
-        list_logits = list(map(lambda m: m(x), self.list_models))
-        tmp = torch.cat(list_logits)
+        list_logits = []
+        for i in range(len(self.list_models)):
+            model = self.list_models[i]
+            logits = model(**x[i])[0] # TODO: wrapper for models
+            list_logits.append(logits)
+        tmp = torch.cat(list_logits, axis=1)
         logits = self.layer_linear(tmp)
-        return self.softmax(logits)
+        return logits
 
 class EnsembleCollator():
     """ text-collater used in training and prediction
@@ -41,19 +35,20 @@ class EnsembleCollator():
     def __call__(self, list_items):
         # extract only tweets, tokenize them
         texts = [item[0] for item in list_items]
-        list_batches = []
+        list_inputs = []
         for tokenizer in self.list_tokenizers:
-            batch = tokenizer(texts, truncation=True, padding=True)
-            list_batches.append(batch)
-        print(batch)
+            inputs = tokenizer(texts, truncation=True, padding=True)
+            inputs = {key: torch.tensor(val) for key, val in inputs.items()} # TODO: wrapper for tokenizers
+            list_inputs.append(inputs)
+        batch = {"inputs": list_inputs}
+
         # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
             labels = [item[1] for item in list_items]
-            for batch in list_batches:
-                batch["labels"] = labels
-        for i in range(len(list_batches)):
-            list_batches[i] = {key: torch.tensor(val) for key, val in list_batches[i].items()}
-        return list_batches
+            labels = torch.tensor(labels)
+            batch["labels"] = labels
+
+        return batch
         
 def main(args):
     if args.verbose: print("reading data...")
@@ -106,9 +101,6 @@ def main(args):
         num_workers=4,
         collate_fn=collate_fn
     )
-    print(next(iter(dl_train)))
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     if args.verbose: print("loading models...")
     list_models = []
@@ -116,7 +108,58 @@ def main(args):
         model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
         list_models.append(model)
     model = EnsembleModel(list_models)
+
+    fn_loss = torch.nn.CrossEntropyLoss()
+
+    train(model, dl_train, dl_test, fn_loss, args)
+
+def move_to_device(x, device):
+    if torch.is_tensor(x):
+        x.to(device)
+    elif isinstance(x, dict):
+        for key in x:
+            move_to_device(x[key], device)
+    else:
+        for element in x:
+            move_to_device(element, device)
+
+def train(model, dl_train, dl_test, fn_loss, args):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
+
+    optimizer = AdamW(model.parameters(), lr=5e-5)
+    scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
+
+    if args.verbose: print("training...")
+    for epoch in range(args.epochs):
+        model.train()
+        avg_loss = 0.0
+        for i, batch in enumerate(dl_train):
+            inputs = batch["inputs"]
+            labels = batch["labels"]
+            move_to_device(inputs, device)
+            move_to_device(labels, device)
+            with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+                preds = model(inputs)
+                loss = fn_loss(preds, labels)
+                loss /= args.accumulation_size
+            scaler.scale(loss).backward()
+            avg_loss += loss.item()
+            if (i + 1) % args.accumulation_size == 0:
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad() 
+                if args.verbose:
+                    print(
+                        "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
+                        (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
+                    )
+                avg_loss = 0.0
+        # evaluation
+        if args.verbose: print("evaluation...")
+        print("accuracy: %.5f" % utils.evaluation(model, dl_test, device))
+        # save model parameters to specified file
+        model.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % (epoch+1)))
    
 if __name__ == "__main__":
     #os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
