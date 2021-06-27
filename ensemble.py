@@ -10,7 +10,7 @@ import utils
 class EnsembleModel(torch.nn.Module):
     def __init__(self, list_models):
         super(EnsembleModel, self).__init__()
-        self.list_models = list_models
+        self.list_models = torch.nn.ModuleList(list_models)
         self.layer_linear = torch.nn.Linear(
             in_features=2*len(list_models),
             out_features=2,
@@ -115,13 +115,14 @@ def main(args):
 
 def move_to_device(x, device):
     if torch.is_tensor(x):
-        x.to(device)
+        x = x.to(device)
     elif isinstance(x, dict):
         for key in x:
-            move_to_device(x[key], device)
+            x[key] = move_to_device(x[key], device)
     else:
-        for element in x:
-            move_to_device(element, device)
+        for idx in range(len(x)):
+            x[idx] = move_to_device(x[idx], device)
+    return x
 
 def train(model, dl_train, dl_test, fn_loss, args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -137,8 +138,8 @@ def train(model, dl_train, dl_test, fn_loss, args):
         for i, batch in enumerate(dl_train):
             inputs = batch["inputs"]
             labels = batch["labels"]
-            move_to_device(inputs, device)
-            move_to_device(labels, device)
+            inputs = move_to_device(inputs, device)
+            labels = move_to_device(labels, device)
             with torch.cuda.amp.autocast(enabled=args.mixed_precision):
                 preds = model(inputs)
                 loss = fn_loss(preds, labels)
@@ -159,7 +160,7 @@ def train(model, dl_train, dl_test, fn_loss, args):
         if args.verbose: print("evaluation...")
         print("accuracy: %.5f" % utils.evaluation(model, dl_test, device))
         # save model parameters to specified file
-        model.save_pretrained(os.path.join(args.model_destination, "checkpoint_%d" % (epoch+1)))
+        model.save_pretrained(os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1)))
    
 if __name__ == "__main__":
     #os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
@@ -167,18 +168,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='train ensemble model on data')
     
     # command line arguments
+    # io
     parser.add_argument('neg_data', type=str, 
         help='path to negative training data', action='store')
     parser.add_argument('pos_data', type=str, 
         help='path to positive training data', action='store')
     parser.add_argument('dir_output', type=str, 
-        help='path where model should be store', action='store')
+        help='directory where model checkpoints should be stored', action='store')
     parser.add_argument('-ckptst', '--checkpoints_tokenizers', nargs="+", 
         help='path to pretrained tokenizers that should be used')
     parser.add_argument('-ckptsm', '--checkpoints_models', nargs="+", 
         help='path to pretrained models that should be used')
     parser.add_argument('-v', '--verbose', 
         help='want verbose output or not?', action='store_true')
+
+    # training
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
         help='number of epochs to train', action='store', default=3)
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
@@ -191,6 +195,7 @@ if __name__ == "__main__":
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
     parser.add_argument('-mp', '--mixed_precision', dest='mixed_precision',
         help='set to enable mixed precision training', action='store_true', default=False)
+
     args = parser.parse_args()
 
     # set seeds
