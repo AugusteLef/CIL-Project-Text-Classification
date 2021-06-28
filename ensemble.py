@@ -20,7 +20,7 @@ class EnsembleModel(torch.nn.Module):
         list_logits = []
         for i in range(len(self.list_models)):
             model = self.list_models[i]
-            logits = model(**x[i])[0] # TODO: wrapper for models
+            logits = model(**x[i])[0] # TODO: wrapper for models because of [0]
             list_logits.append(logits)
         tmp = torch.cat(list_logits, axis=1)
         logits = self.layer_linear(tmp)
@@ -40,7 +40,7 @@ class EnsembleCollator():
             inputs = tokenizer(texts, truncation=True, padding=True)
             inputs = {key: torch.tensor(val) for key, val in inputs.items()} # TODO: wrapper for tokenizers
             list_inputs.append(inputs)
-        batch = {"inputs": list_inputs}
+        batch = {"inputs": {"x": list_inputs}}
 
         # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
@@ -77,6 +77,10 @@ def main(args):
     if args.verbose:
         print("%d training samples" % (n_neg + n_pos))
         print("%d test samples" % (len(texts_neg) - n_neg + len(texts_pos) - n_pos))
+
+    # create output directory
+    if not os.path.isdir(args.dir_output):
+        os.makedirs(args.dir_output)
 
     if args.verbose: print("loading tokenizers...")
     list_tokenizers = []
@@ -143,7 +147,7 @@ def evaluation(model, dataloader, device):
             labels = batch["labels"]
             inputs = move_to_device(inputs, device)
             labels = move_to_device(labels, device)
-            logits = model(inputs)
+            logits = model(**inputs)
             preds = torch.argmax(logits, dim=1)
             count_correct += torch.sum(preds == labels).item()
     accuracy = count_correct / len(dataloader.dataset)
@@ -166,7 +170,7 @@ def train(model, dl_train, dl_test, fn_loss, args):
             inputs = move_to_device(inputs, device)
             labels = move_to_device(labels, device)
             with torch.cuda.amp.autocast(enabled=args.mixed_precision):
-                preds = model(inputs)
+                preds = model(**inputs)
                 loss = fn_loss(preds, labels)
                 loss /= args.accumulation_size
             scaler.scale(loss).backward()
@@ -178,17 +182,26 @@ def train(model, dl_train, dl_test, fn_loss, args):
                 if args.verbose:
                     print(
                         "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
-                        (epoch+1, args.epochs, i//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
+                        (epoch+1, args.epochs, (i+1)//args.accumulation_size, len(dl_train)//args.accumulation_size, avg_loss)
                     )
                 avg_loss = 0.0
         # evaluation
+        accuracy = evaluation(model, dl_test, device)
         if args.verbose: print("evaluation...")
-        print("accuracy: %.5f" % evaluation(model, dl_test, device))
+        print("accuracy: %.5f" % accuracy)
         # save model parameters to specified file
-        model.save_pretrained(os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1)))
+        checkpoint = {
+            "epoch": epoch + 1,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "scaler_state_dict": scaler.state_dict(),
+            "accuracy": accuracy,
+        }
+        path_checkpoint = os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1))
+        torch.save(checkpoint, path_checkpoint)
    
 if __name__ == "__main__":
-    #os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
 
     parser = argparse.ArgumentParser(description='train ensemble model on data')
     
