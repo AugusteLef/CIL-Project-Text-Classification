@@ -8,13 +8,17 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Adam
 import utils
 
 class EnsembleModel(torch.nn.Module):
-    def __init__(self, list_models):
+    def __init__(self, list_models, freeze_models=False):
         super(EnsembleModel, self).__init__()
         self.list_models = torch.nn.ModuleList(list_models)
         self.layer_linear = torch.nn.Linear(
             in_features=2*len(list_models),
             out_features=2,
         )
+        if freeze_models:
+            for model in self.list_models:
+                for param in model.parameters():
+                    param.requires_grad = False
     
     def forward(self, x):
         list_logits = []
@@ -25,7 +29,7 @@ class EnsembleModel(torch.nn.Module):
         tmp = torch.cat(list_logits, axis=1)
         logits = self.layer_linear(tmp)
         return logits
-
+    
 class EnsembleCollator():
     """ text-collater used in training and prediction
     """
@@ -111,7 +115,7 @@ def main(args):
     for checkpoint in args.checkpoints_models:
         model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
         list_models.append(model)
-    model = EnsembleModel(list_models)
+    model = EnsembleModel(list_models, args.freeze_models)
 
     fn_loss = torch.nn.CrossEntropyLoss()
 
@@ -217,6 +221,8 @@ if __name__ == "__main__":
         help='path to pretrained tokenizers that should be used')
     parser.add_argument('-ckptsm', '--checkpoints_models', nargs="+", 
         help='path to pretrained models that should be used')
+    parser.add_argument('-fm', '--freeze_models', 
+        help='set to freeze submodules', action='store_true')
     parser.add_argument('-v', '--verbose', 
         help='want verbose output or not?', action='store_true')
 
