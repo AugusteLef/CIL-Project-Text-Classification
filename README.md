@@ -31,7 +31,7 @@ mv twitter-datasets/* Data
 ```
 The dataset should contain the following files:
 - sample_submission.csv
-- train_neg.txt :  a subset of negative training samples
+- train_neg.txt : a subset of negative training samples
 - train_pos.txt: a subset of positive training samples
 - test_data.txt:
 - train_neg_full.txt: the full negative training samples
@@ -53,7 +53,7 @@ Train on preprocessed data and save trained model (compute node):
 ```
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bart-base_basic -pm Pretrained_Models/bart-base/ -v
 
-python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bert-base-uncased_basic -pm Pretrained_Models/bart-base-uncased/ -v
+python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bert-base-uncased_basic -pm Pretrained_Models/bert-base-uncased/ -v
 
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/xlnet-base-cased_basic -pm Pretrained_Models/xlnet-base-cased/ -v -x
 ```
