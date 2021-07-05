@@ -147,7 +147,7 @@ def data_augmentation(tweet: str) -> str:
     Returns:
         string: new augmented tweet
     """
-    
+
     return None
 
 def main(args):
@@ -173,6 +173,10 @@ def main(args):
     if args.verbose: print("processing: remove punctuation and special characters...")
     df['tweet'] = df['tweet'].apply(lambda row: remove_punctuation(str(row)))
     # stop words
+    if args.augmentation:
+        if args.verbose: print("processing: data augmentation...")
+        augmentation = df['tweet'].apply(lambda row: data_augmentation((str(row))))
+        #add the augmentation to df...
     if args.stop_words:
         if args.verbose: print("processing: remove stopwords...")
         df['tweet'] = df['tweet'].apply(lambda row: remove_stop_words(str(row)))
@@ -199,6 +203,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--stemming', dest='stemming', help='do you want to stemm tweet?', action='store_true')
     parser.add_argument('-l', '--lemmatizing', dest='lemmatizing', help='do you want to lemmatize tweet?', action='store_true')
     parser.add_argument('-sw', '--stop_words', dest='stop_words', help='do you to remove stop words?', action='store_true')
+    parser.add_argument('-a', '--augmentation', dest='augmentation', help='want to do data augmentation?', action='store_true')
     parser.add_argument('-v', '--verbose', dest='verbose', help='want verbose output or not?', action='store_true')
     args = parser.parse_args()
     main(args)
