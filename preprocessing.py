@@ -138,6 +138,18 @@ def remove_punctuation(tweet: str) -> str:
     tweet = "".join([char for char in tweet if char not in string.punctuation])
     return tweet
 
+def data_augmentation(tweet: str) -> str:
+    """ Creates a new tweet replacing a word by its synonym using the Thesaurus-based subsititution
+
+    Args:
+        tweet (string): tweet as string
+
+    Returns:
+        string: new augmented tweet
+    """
+    
+    return None
+
 def main(args):
     """ runs the whole preprocessing pipeline according to command line arguments
 
