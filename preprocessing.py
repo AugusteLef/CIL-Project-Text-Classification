@@ -147,8 +147,9 @@ def data_augmentation(tweet: str) -> str:
     Returns:
         string: new augmented tweet
     """
-
-    return None
+    # try with 2 words instead of 3 as well, might be better?
+    augmented_tweet = utils.synonym_replacement(tweet, 3)
+    return augmented_tweet
 
 def main(args):
     """ runs the whole preprocessing pipeline according to command line arguments
@@ -163,6 +164,12 @@ def main(args):
     # basic preprocessing
     if args.verbose: print("basic processing...")
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
+    #data augmentation
+    if args.augmentation:
+        if args.verbose: print("processing: data augmentation...")
+        augmentation = pd.DataFrame(columns=['tweet'])
+        augmentation['tweet'] = df['tweet'].apply(lambda row: data_augmentation((str(row))))
+        df = pd.concat([df, augmentation], ignore_index=True, sort=False)
     # contractions
     if args.verbose: print("processing: replace contraction...")
     df['tweet'] = df['tweet'].apply(lambda row: replace_contractions(str(row)))
@@ -173,10 +180,6 @@ def main(args):
     if args.verbose: print("processing: remove punctuation and special characters...")
     df['tweet'] = df['tweet'].apply(lambda row: remove_punctuation(str(row)))
     # stop words
-    if args.augmentation:
-        if args.verbose: print("processing: data augmentation...")
-        augmentation = df['tweet'].apply(lambda row: data_augmentation((str(row))))
-        #add the augmentation to df...
     if args.stop_words:
         if args.verbose: print("processing: remove stopwords...")
         df['tweet'] = df['tweet'].apply(lambda row: remove_stop_words(str(row)))
