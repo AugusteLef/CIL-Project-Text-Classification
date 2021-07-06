@@ -2,6 +2,8 @@
 Data
 sample_submission.csv
 **/twitter-datasets
+LectureBaselines/Embeddings/
+LectureBaselines/Vocabs/
 
 # environments
 *venv*

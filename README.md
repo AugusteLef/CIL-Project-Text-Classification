@@ -4,8 +4,7 @@ Some scripts may assume the following file-structure:
 - Models : Directory containing all fine-tuned models that we use for prediction.
 - Predictions : Directory containing all predictions for test-set.
 - Preprocessing_Data : Directory containing wordlists and other data used for preprocessing.
-- Pretrained_Models : Directory containing pretrained models downloaded form huggingface.
-- Vocab : Directory containing vocab artefacts.
+- LectureBaselines : Directory containing implementations of the baselines from the exercises. A separate ReadMe can be found here.
 
 The following scripts should be contained in the main project folder:
 - preloading.py : Downloads models from huggingface and data for nltk library.

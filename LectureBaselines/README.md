@@ -1,11 +1,15 @@
-## Lecture Baselines
+This folder contains the code used to create the baselines that are based on what we have seen in the lecture (and the exercises and tutorials). Note that in contrast to other code we have written, the scripts in this folder do not take any command-line arguments which means that the source code has to be changed if you want perform other experiments than the ones we intended.
 
-This folder contains the code used to create the baselines that we have seen in the lecture (i.e. in the master solutions or the tutorials). There are two such baselines: 
-- The first one uses a simple count vectorizer and a logistic classifier. It is fully implemented in the file 'count_vectorizer_linear_model.py'. This script reads the training data, uses the #appearances of the 5000 most frequent words as features and trains a classifier. It then reads the test data and creates predictions in the format accepted by the Kaggle competition.
-- The second one uses the GloVe embeddings. Here, the pipeline is more complicated:
-    - build_vocab.sh creates a list of all words appearing in the training data.
-    - cut_vocab.sh removes low-frequency words from that list.
-    - pickle_vocab.py dumps this filtered list in vocab.pkl.
-    - cooc.py is then used to create the co-occurence matrix cooc.pkl.
-    - glove_embeddings.py creates the embeddings from the co-occurence matrix
-    - glove_predictions.py finally trains a logistic classifier using the as features the average over word embeddings in one tweet
+## File Structue
+
+The scripts in this folder might assume the following file structure:
+- Embeddings : Directory containing GloVe embeddings
+- Vocabs : Directory containing vocabulary files
+
+## Workflow
+
+In order to run our experiments for the baselines, first make sure that the necessary (preprocessed) datafiles are present in ../Data/. Also make sure to install the ../requirements.txt. Once that is done, the workflow is as follows:
+- run glove.py to create GloVe embeddings. This script runs multiple pre-defined experiments, each constructing GloVe embeddings a bit differently. The embeddings are placed in Embeddings/.
+- run predictions.py. This will run several pre-defined experiments, each combines a vectorizer and a classification model to create predictions which can then be uploaded to Kaggle. The predictions are placed in ../Predictions. The script also outputs training and validation accuracy for each experiment.
+
+
