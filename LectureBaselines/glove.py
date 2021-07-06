@@ -15,11 +15,41 @@ DATASETS = [
         'name' : 'small', 
         'neg_data' : '../Data/train_neg.txt', 
         'pos_data' :'../Data/train_pos.txt',
-        'embedding_dimension' : 20,
+        'embedding_dimension' : 100,
         'nmax' : 100,
         'eta' : 0.001,
         'alpha' : 3/4,
-        'epochs' : 2
+        'epochs' : 20
+    },
+    {
+        'name' : 'small_basic', 
+        'neg_data' : '../Data/train_neg_basic.txt', 
+        'pos_data' :'../Data/train_pos_basic.txt',
+        'embedding_dimension' : 100,
+        'nmax' : 100,
+        'eta' : 0.001,
+        'alpha' : 3/4,
+        'epochs' : 20
+    },
+    {
+        'name' : 'full', 
+        'neg_data' : '../Data/train_neg_full.txt', 
+        'pos_data' :'../Data/train_pos_full.txt',
+        'embedding_dimension' : 100,
+        'nmax' : 100,
+        'eta' : 0.001,
+        'alpha' : 3/4,
+        'epochs' : 20
+    },
+    {
+        'name' : 'full_basic', 
+        'neg_data' : '../Data/train_neg_full_basic.txt', 
+        'pos_data' :'../Data/train_pos_full_basic.txt',
+        'embedding_dimension' : 100,
+        'nmax' : 100,
+        'eta' : 0.001,
+        'alpha' : 3/4,
+        'epochs' : 20
     }
     ]
 
