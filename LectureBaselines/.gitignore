@@ -1,0 +1,6 @@
+# do not upload data of intermediary steps
+cooc.pkl
+embeddings.npz
+vocab.pkl
+vocab.txt
+vocab_cut.txt
