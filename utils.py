@@ -1,36 +1,31 @@
-import torch
 import pandas as pd
+import torch
+from transformers import AdamW
 
-def load_raw_data(path: str) -> pd.DataFrame:
-    """Create a Dataframe containing each tweet
+def get_data_training(path_data_neg, path_data_pos, split):
+    # get data
+    if path_data_neg[-3:] == "txt":
+        f_neg = open(path_data_neg)
+        texts_neg = f_neg.readlines()
+    else:
+        df_neg = pd.read_csv(path_data_neg, keep_default_na=False)
+        texts_neg = list(df_neg["tweet"])
+    if path_data_pos[-3:] == "txt":
+        f_pos = open(path_data_pos)
+        texts_pos = f_pos.readlines()
+    else:
+        df_pos = pd.read_csv(path_data_pos, keep_default_na=False)
+        texts_pos = list(df_pos["tweet"])
 
-    Args:
-        path (str): The path of the file (.txt) to load tweets from
+    # build train / test split
+    split_neg = int(split*len(texts_neg))
+    split_pos = int(split*len(texts_pos))
+    texts_train = texts_neg[:split_neg] + texts_pos[:split_pos]
+    labels_train = [0] * split_neg + [1] * split_pos
+    texts_test = texts_neg[split_neg:] + texts_pos[split_pos:]
+    labels_test = [0] * (len(texts_neg) - split_neg) + [1] * (len(texts_pos) - split_pos)
 
-    Returns:
-        DataFrame: a Dataframe with one row per tweet
-    """
-    data = []
-    with open(path) as file:
-        for line in file:
-            data.append(line)
-    data_df = pd.DataFrame(data, columns = {'tweet'})
-    return data_df
-    
-def XLNET_tweets_transformation(tweets):
-    """ XLNET needs sep and cls tags at the end of each tweet
-
-    Args:
-        list of tweets
-
-    Returns: 
-        list of processed tweets
-    """
-    out = []
-    for tweet in tweets:
-        tweet = tweet + '[SEP] [CLS]'
-        out.append(tweet)
-    return out
+    return texts_train, labels_train, texts_test, labels_test
 
 class TextDataset(torch.utils.data.Dataset):
     """ torch-dataset used in training and prediction
@@ -51,48 +46,24 @@ class TextDataset(torch.utils.data.Dataset):
 class TextCollator():
     """ text-collater used in training and prediction
     """
-    def __init__(self, tokenizer, xlnet=False):
+    def __init__(self, tokenizer):
         self.tokenizer = tokenizer
-        self.xlnet = xlnet
 
     def __call__(self, list_items):
-        # extract only tweets, tokenize them
+        # extract texts, tokenize them
         texts = [item[0] for item in list_items]
-        batch = 0 # TODO: is this variable declaration needed?
-        if self.xlnet:
-            batch = self.tokenizer(texts, truncation=True, padding=True, max_length=140)
-        else:
-            batch = self.tokenizer(texts, truncation=True, padding=True)
+        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=512)
+        inputs = {key: torch.tensor(val) for key, val in inputs.items()}
+        batch = {"inputs": {"x": inputs}}
+
         # extract labels (if we are training and not predicting)
         if 1 < len(list_items[0]):
             labels = [item[1] for item in list_items]
+            labels = torch.tensor(labels)
             batch["labels"] = labels
-        batch = {key: torch.tensor(val) for key, val in batch.items()}
+        
         return batch
 
-class EnsembleModel(torch.nn.Module):
-    def __init__(self, list_models, freeze_models=False):
-        super(EnsembleModel, self).__init__()
-        self.list_models = torch.nn.ModuleList(list_models)
-        self.layer_linear = torch.nn.Linear(
-            in_features=9, # TODO: change back to 2*len(list_models) 
-            out_features=2,
-        )
-        if freeze_models:
-            for model in self.list_models:
-                for param in model.parameters():
-                    param.requires_grad = False
-    
-    def forward(self, x):
-        list_logits = []
-        for i in range(len(self.list_models)):
-            model = self.list_models[i]
-            logits = model(**x[i])[0] # TODO: wrapper for models because of [0]
-            list_logits.append(logits)
-        tmp = torch.cat(list_logits, axis=1)
-        logits = self.layer_linear(tmp)
-        return logits
-    
 class EnsembleCollator():
     """ text-collater used in training and prediction
     """
@@ -105,7 +76,7 @@ class EnsembleCollator():
         list_inputs = []
         for tokenizer in self.list_tokenizers:
             inputs = tokenizer(texts, truncation=True, padding=True, max_length=512)
-            inputs = {key: torch.tensor(val) for key, val in inputs.items()} # TODO: wrapper for tokenizers
+            inputs = {key: torch.tensor(val) for key, val in inputs.items()}
             list_inputs.append(inputs)
         batch = {"inputs": {"x": list_inputs}}
 
@@ -128,7 +99,54 @@ def move_to_device(x, device):
             x[idx] = move_to_device(x[idx], device)
     return x
 
-def evaluation(model, dataloader, device):
+def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
+    optimizer = AdamW(model.parameters(), lr=5e-5)
+    scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
+    for epoch in range(args.epochs):
+        model.train()
+        avg_loss = 0.0
+        for i, batch in enumerate(dataloader_train):
+            inputs = batch["inputs"]
+            labels = batch["labels"]
+            inputs = move_to_device(inputs, device)
+            labels = move_to_device(labels, device)
+            with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+                preds = model(**inputs)
+                loss = fn_loss(preds, labels)
+                loss /= args.accumulation_size
+            scaler.scale(loss).backward()
+            avg_loss += loss.item()
+            if (i + 1) % args.accumulation_size == 0:
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad() 
+                if args.verbose:
+                    print(
+                        "epoch %d/%d, batch %d/%d, avg. loss: %.3f" %
+                        (
+                            epoch+1,
+                            args.epochs,
+                            (i+1)//args.accumulation_size,
+                            len(dataloader_train)//args.accumulation_size, avg_loss
+                        )
+                    )
+                avg_loss = 0.0
+        # evaluation
+        accuracy = evaluation(model, dataloader_test, device)
+        if args.verbose: print("evaluation...")
+        print("accuracy: %.5f" % accuracy)
+        # save model parameters to specified file
+        checkpoint = {
+            "epoch": epoch + 1,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "scaler_state_dict": scaler.state_dict(),
+            "accuracy": accuracy,
+        }
+        path_checkpoint = os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1))
+        torch.save(checkpoint, path_checkpoint)
+
+def evaluation(model, dataloader, device, args):
     """ estimate accuracy of model
 
     Args:
@@ -143,11 +161,24 @@ def evaluation(model, dataloader, device):
     count_correct = 0.0
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            labels = batch['labels'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
-            preds = torch.argmax(outputs[1], dim=1)
+            inputs = batch["inputs"]
+            labels = batch["labels"]
+            inputs = move_to_device(inputs, device)
+            labels = move_to_device(labels, device)
+            logits = model(**inputs)
+            preds = torch.argmax(logits, dim=1)
             count_correct += torch.sum(preds == labels).item()
     accuracy = count_correct / len(dataloader.dataset)
     return accuracy
+
+def inference(model, dl, device):
+    model.eval()
+    results = []
+    with torch.no_grad():
+        for i, batch in enumerate(dl):
+            inputs = batch["inputs"]
+            inputs = utils.move_to_device(inputs, device)
+            logits = model(**inputs)
+            preds = torch.argmax(logits, dim=1)
+            results += list(preds.cpu().numpy())
+    return results
