@@ -53,7 +53,7 @@ def main(args):
     model.to(device)
    
     # inference
-    preds = inference(model, dl, device, args)
+    preds = inference(model, dl, device)
 
     # write output
     if args.verbose: print("writing output...")

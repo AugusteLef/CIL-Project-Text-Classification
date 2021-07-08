@@ -13,21 +13,17 @@ def main(args):
     Args:
         command-line arguments containing path to model, data etc.
     """
-    # get the data
+    # get data
     if args.verbose: print("reading data...")
     tweets = open(args.path_data)
     texts = tweets.readlines()
 
-    # XLNET need sep and cls tags at the end of each tweet
-    if args.XLNET:
-        texts = utils.XLNET_tweets_transformation(texts)
-    
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(args.dir_tokenizer) 
-    collate_fn = utils.TextCollator(tokenizer)
 
     # build dataloader
+    collate_fn = utils.TextCollator(tokenizer)
     ds = utils.TextDataset(texts) 
     dl = torch.utils.data.DataLoader(
         dataset=ds,
@@ -35,32 +31,26 @@ def main(args):
         shuffle=False,
         num_workers=2,
         collate_fn=collate_fn
-        )
+    )
+
+    # build model
+    model = AutoModelForSequenceClassification.from_pretrained(args.dir_model)
 
     # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # load pretrained model
-    model = AutoModelForSequenceClassification.from_pretrained(args.dir_model)
+    # load checkpoint
+    checkpoint = torch.load(args.checkpoint, map_location=device)
+    model.load_state_dict(checkpoint["model_state_dict"])
     model.to(device)
-    
+   
     # inference
-    if args.verbose: print("inference...")
-    model.eval()
-    results = []
-    with torch.no_grad():
-        for i, batch in enumerate(dl):
-            input_ids = batch['input_ids'].to(device)
-            attention_mask = batch['attention_mask'].to(device)
-            outputs = model(input_ids, attention_mask=attention_mask)
-            preds = torch.argmax(outputs[0], dim=1)
-            tmp = list(preds.cpu().numpy())
-            tmp = list(map(lambda x: -1 if x == 0 else 1, tmp))
-            results += tmp
-    
-    # writing output
+    preds = inference(model, dl, device)
+
+    # write output
     if args.verbose: print("writing output...")
-    df = pd.DataFrame(results, index=list(range(1, len(results)+1)))
+    preds = list(map(lambda x: -1 if x == 0 else 1, preds))
+    df = pd.DataFrame(preds, index=list(range(1, len(preds)+1)))
     df.to_csv(args.path_output, header=["Prediction"], index_label="Id")
 
 # creates prediction for given data using given model
