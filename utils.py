@@ -70,6 +70,64 @@ class TextCollator():
         batch = {key: torch.tensor(val) for key, val in batch.items()}
         return batch
 
+class EnsembleModel(torch.nn.Module):
+    def __init__(self, list_models, freeze_models=False):
+        super(EnsembleModel, self).__init__()
+        self.list_models = torch.nn.ModuleList(list_models)
+        self.layer_linear = torch.nn.Linear(
+            in_features=9, # TODO: change back to 2*len(list_models) 
+            out_features=2,
+        )
+        if freeze_models:
+            for model in self.list_models:
+                for param in model.parameters():
+                    param.requires_grad = False
+    
+    def forward(self, x):
+        list_logits = []
+        for i in range(len(self.list_models)):
+            model = self.list_models[i]
+            logits = model(**x[i])[0] # TODO: wrapper for models because of [0]
+            list_logits.append(logits)
+        tmp = torch.cat(list_logits, axis=1)
+        logits = self.layer_linear(tmp)
+        return logits
+    
+class EnsembleCollator():
+    """ text-collater used in training and prediction
+    """
+    def __init__(self, list_tokenizers):
+        self.list_tokenizers = list_tokenizers
+
+    def __call__(self, list_items):
+        # extract only tweets, tokenize them
+        texts = [item[0] for item in list_items]
+        list_inputs = []
+        for tokenizer in self.list_tokenizers:
+            inputs = tokenizer(texts, truncation=True, padding=True, max_length=512)
+            inputs = {key: torch.tensor(val) for key, val in inputs.items()} # TODO: wrapper for tokenizers
+            list_inputs.append(inputs)
+        batch = {"inputs": {"x": list_inputs}}
+
+        # extract labels (if we are training and not predicting)
+        if 1 < len(list_items[0]):
+            labels = [item[1] for item in list_items]
+            labels = torch.tensor(labels)
+            batch["labels"] = labels
+
+        return batch
+
+def move_to_device(x, device):
+    if torch.is_tensor(x):
+        x = x.to(device)
+    elif isinstance(x, dict):
+        for key in x:
+            x[key] = move_to_device(x[key], device)
+    else:
+        for idx in range(len(x)):
+            x[idx] = move_to_device(x[idx], device)
+    return x
+
 def evaluation(model, dataloader, device):
     """ estimate accuracy of model
 

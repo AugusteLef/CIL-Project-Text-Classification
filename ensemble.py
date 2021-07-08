@@ -41,7 +41,7 @@ class EnsembleCollator():
         texts = [item[0] for item in list_items]
         list_inputs = []
         for tokenizer in self.list_tokenizers:
-            inputs = tokenizer(texts, truncation=True, padding=True)
+            inputs = tokenizer(texts, truncation=True, padding=True, max_length=512)
             inputs = {key: torch.tensor(val) for key, val in inputs.items()} # TODO: wrapper for tokenizers
             list_inputs.append(inputs)
         batch = {"inputs": {"x": list_inputs}}
