@@ -6,30 +6,8 @@ import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, AdamW
 
 import utils
+import models
 
-class EnsembleModel(torch.nn.Module):
-    def __init__(self, list_models, freeze_models=False):
-        super(EnsembleModel, self).__init__()
-        self.list_models = torch.nn.ModuleList(list_models)
-        self.layer_linear = torch.nn.Linear(
-            in_features=2*len(list_models),
-            out_features=2,
-        )
-        if freeze_models:
-            for model in self.list_models:
-                for param in model.parameters():
-                    param.requires_grad = False
-    
-    def forward(self, x):
-        list_logits = []
-        for i in range(len(self.list_models)):
-            model = self.list_models[i]
-            logits = model(**x[i])[0] # TODO: wrapper for models because of [0]
-            list_logits.append(logits)
-        tmp = torch.cat(list_logits, axis=1)
-        logits = self.layer_linear(tmp)
-        return logits
-    
 def main(args):
     # get data
     if args.verbose: print("reading data...")
@@ -70,7 +48,7 @@ def main(args):
     for checkpoint in args.checkpoints_models:
         model = AutoModelForSequenceClassification.from_pretrained(checkpoint, num_labels=2)
         list_models.append(model)
-    model = EnsembleModel(list_models, args.freeze_models)
+    model = models.EnsembleModel(list_models, args.freeze_models)
 
     # define loss function
     fn_loss = torch.nn.CrossEntropyLoss()

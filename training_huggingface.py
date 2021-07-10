@@ -5,17 +5,8 @@ import random
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-# import custom utils
 import utils
-
-class HuggingfaceModel(torch.nn.Module):
-    def __init__(self, model_huggingface):
-        super(HuggingfaceModel, self).__init__()
-        self.model_huggingface = model_huggingface
-
-    def forward(self, x):
-        outputs_huggingface = self.model_huggingface(**x)
-        return outputs_huggingface["logits"]
+import models
 
 def main(args):
     """ main training routine
@@ -56,7 +47,7 @@ def main(args):
     # get model
     if args.verbose: print("loading model...")
     model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2)
-    model = HuggingfaceModel(model_huggingface)
+    model = models.HuggingfaceModel(model_huggingface)
     
     # define loss function
     fn_loss = torch.nn.CrossEntropyLoss()

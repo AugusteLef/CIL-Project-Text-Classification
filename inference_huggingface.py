@@ -4,8 +4,8 @@ import argparse
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
-# import custom utils
 import utils
+import models
 
 def main(args):
     """ creates predictions for given data using given model
@@ -34,8 +34,10 @@ def main(args):
     )
 
     # build model
-    model = AutoModelForSequenceClassification.from_pretrained(args.dir_model)
-
+    if args.verbose: print("loading model...")
+    model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.dir_model, num_labels=2)
+    model = models.HuggingfaceModel(model_huggingface)
+    
     # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -45,7 +47,13 @@ def main(args):
     model.to(device)
    
     # inference
-    preds = inference(model, dl, device)
+    if args.verbose: print("inference...")
+    preds = utils.inference(model, dl, device)
+
+    # create output directory
+    dir_output = os.path.dirname(args.path_output)
+    if not os.path.isdir(dir_output):
+        os.makedirs(dir_output)
 
     # write output
     if args.verbose: print("writing output...")
@@ -55,25 +63,26 @@ def main(args):
 
 # creates prediction for given data using given model
 if __name__ == "__main__":
-    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
-
     parser = argparse.ArgumentParser(description='predict labels with given model')
 
     # command-line arguments
+    # io
     parser.add_argument('path_data', type=str, 
         help='path to test data', action='store')
     parser.add_argument('path_output', type=str, 
         help='path to write output to', action='store')
+    parser.add_argument('-v', '--verbose', dest='verbose', 
+        help='want verbose output or not?', action='store_true')
     parser.add_argument('-dt', '--dir_tokenizer', dest='dir_tokenizer', type=str, 
         help='directory containing tokenizer')
     parser.add_argument('-dm', '--dir_model', dest='dir_model', type=str, 
         help='directory containing model')
-    parser.add_argument('-v', '--verbose', dest='verbose', 
-        help='want verbose output or not?', action='store_true')
+    parser.add_argument('-ckpt', '--checkpoint', type=str, 
+        help='path to pretrained model that should be used')
+
+    # inference
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=16)
-    parser.add_argument('-x', '--XLNET', dest='XLNET', 
-        help='must set this flag when using XLNET', action='store_true')
 
     args = parser.parse_args()
     

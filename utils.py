@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import torch
 from transformers import AdamW
@@ -89,6 +90,15 @@ class EnsembleCollator():
         return batch
 
 def move_to_device(x, device):
+    """ move torch tensors in x to specified torch device
+
+    Args:
+        x: datastructure containing torch tensors
+        device : torch device to move to
+
+    Returns:
+        same datastructure as x but with torch tensors moved to specified device
+    """
     if torch.is_tensor(x):
         x = x.to(device)
     elif isinstance(x, dict):
@@ -100,6 +110,19 @@ def move_to_device(x, device):
     return x
 
 def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
+    """ train the model and save checkpoints after every epoch
+
+    Args:
+        model : model to train
+        dataloader_train : data to train on
+        dataloader_test: data to evaluate on
+        fn_loss: loss function to use
+        device : torch device
+        args: command line arguments
+
+    Returns:
+        None
+    """
     optimizer = AdamW(model.parameters(), lr=5e-5)
     scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
     for epoch in range(args.epochs):
@@ -146,7 +169,7 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
         path_checkpoint = os.path.join(args.dir_output, "checkpoint_%d" % (epoch+1))
         torch.save(checkpoint, path_checkpoint)
 
-def evaluation(model, dataloader, device, args):
+def evaluation(model, dataloader, device):
     """ estimate accuracy of model
 
     Args:
@@ -171,14 +194,24 @@ def evaluation(model, dataloader, device, args):
     accuracy = count_correct / len(dataloader.dataset)
     return accuracy
 
-def inference(model, dl, device):
+def inference(model, dataloader, device):
+    """ get models predictions for the given data
+
+    Args:
+        model : model to use
+        dataloader : data to use
+        device : torch device
+
+    Returns:
+        list of the models prediction for the given data
+    """
     model.eval()
-    results = []
+    preds = []
     with torch.no_grad():
-        for i, batch in enumerate(dl):
+        for i, batch in enumerate(dataloader):
             inputs = batch["inputs"]
-            inputs = utils.move_to_device(inputs, device)
+            inputs = move_to_device(inputs, device)
             logits = model(**inputs)
-            preds = torch.argmax(logits, dim=1)
-            results += list(preds.cpu().numpy())
-    return results
+            preds_batch = torch.argmax(logits, dim=1)
+            preds += list(preds_batch.cpu().numpy())
+    return preds

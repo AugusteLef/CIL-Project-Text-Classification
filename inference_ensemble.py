@@ -4,8 +4,8 @@ import argparse
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
-# import custom utils
 import utils
+import models
 
 def main(args):
     """ creates predictions for given data using given model
@@ -42,7 +42,7 @@ def main(args):
     for checkpoint in args.checkpoints_models:
         model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
         list_models.append(model)
-    model = utils.EnsembleModel(list_models)
+    model = models.EnsembleModel(list_models)
     
     # use gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -53,7 +53,13 @@ def main(args):
     model.to(device)
    
     # inference
-    preds = inference(model, dl, device)
+    if args.verbose: print("inference...")
+    preds = utils.inference(model, dl, device)
+
+    # create output directory
+    dir_output = os.path.dirname(args.path_output)
+    if not os.path.isdir(dir_output):
+        os.makedirs(dir_output)
 
     # write output
     if args.verbose: print("writing output...")
@@ -61,23 +67,8 @@ def main(args):
     df = pd.DataFrame(preds, index=list(range(1, len(preds)+1)))
     df.to_csv(args.path_output, header=["Prediction"], index_label="Id")
 
-def inference(model, dl, device, args):
-    if args.verbose: print("inference...")
-    model.eval()
-    results = []
-    with torch.no_grad():
-        for i, batch in enumerate(dl):
-            inputs = batch["inputs"]
-            inputs = utils.move_to_device(inputs, device)
-            logits = model(**inputs)
-            preds = torch.argmax(logits, dim=1)
-            results += list(preds.cpu().numpy())
-    return results
-
 # creates prediction for given data using given model
 if __name__ == "__main__":
-    os.environ["TRANSFORMERS_CACHE"] = os.path.join(os.environ["SCRATCH"], ".cache")
-
     parser = argparse.ArgumentParser(description='predict labels with given model')
 
     # command-line arguments
@@ -86,14 +77,14 @@ if __name__ == "__main__":
         help='path to test data', action='store')
     parser.add_argument('path_output', type=str, 
         help='path to write output to', action='store')
+    parser.add_argument('-v', '--verbose', dest='verbose', 
+        help='want verbose output or not?', action='store_true')
     parser.add_argument('-ckptst', '--checkpoints_tokenizers', nargs="+", 
         help='path to pretrained tokenizers that should be used')
     parser.add_argument('-ckptsm', '--checkpoints_models', nargs="+", 
         help='path to pretrained models that should be used')
     parser.add_argument('-ckpt', '--checkpoint', type=str, 
         help='path to pretrained model that should be used')
-    parser.add_argument('-v', '--verbose', dest='verbose', 
-        help='want verbose output or not?', action='store_true')
 
     # inference
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
