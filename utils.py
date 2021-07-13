@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import random
 import torch
 from transformers import AdamW
 
@@ -19,6 +20,8 @@ def get_data_training(path_data_neg, path_data_pos, split):
         texts_pos = list(df_pos["tweet"])
 
     # build train / test split
+    random.shuffle(texts_neg) # should not be necessary but somehow is
+    random.shuffle(texts_pos) # should not be necessary but somehow is
     split_neg = int(split*len(texts_neg))
     split_pos = int(split*len(texts_pos))
     texts_train = texts_neg[:split_neg] + texts_pos[:split_pos]

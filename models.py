@@ -1,5 +1,5 @@
 import torch
-from transformers import BartModel, BertModel, XLNetModel
+from transformers import AutoModelForSequenceClassification
 
 class HuggingfaceModel(torch.nn.Module):
     def __init__(self, model_huggingface):
@@ -13,35 +13,54 @@ class HuggingfaceModel(torch.nn.Module):
 class BartModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict):
         super(BartModelForEnsemble, self).__init__()
-        self.model = BartModel.from_pretrained("facebook/bart-base")
-        self.model.load_state_dict(model_state_dict["model"])
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("facebook/bart-base", num_labels=2)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.model
     
     def forward(self, x):
         outputs = self.model(**x)
         mask_eos = x["input_ids"].eq(self.model.config.eos_token_id)
-        hidden_state_eos = outputs["last_hidden_state"][:, mask_eos]
+        hidden_state_eos = outputs["last_hidden_state"][mask_eos]
         return hidden_state_eos
 
 class BertModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict):
         super(BertModelForEnsemble, self).__init__()
-        self.model = BertModel.from_pretrained("bert-base-uncased")
-        self.model.load_state_dict(model_state_dict["bert"])
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.bert
     
     def forward(self, x):
         outputs = self.model(**x)
-        hidden_state_cls = outputs["last_hidden_state"][0]
+        hidden_state_cls = outputs["last_hidden_state"][:,0]
+        return hidden_state_cls
+
+class BertweetModelForEnsemble(torch.nn.Module):
+    def __init__(self, model_state_dict):
+        super(BertweetModelForEnsemble, self).__init__()
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=2)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.roberta
+    
+    def forward(self, x):
+        outputs = self.model(**x)
+        hidden_state_cls = outputs["last_hidden_state"][:,0]
         return hidden_state_cls
 
 class XLNetModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict):
-        super(BertModelForEnsemble, self).__init__()
-        self.model = XLNetModel.from_pretrained("xlnet-base-cased")
-        self.model.load_state_dict(model_state_dict["transformer"])
+        super(XLNetModelForEnsemble, self).__init__()
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=2)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.transformer
     
     def forward(self, x):
         outputs = self.model(**x)
-        hidden_state_cls = outputs["last_hidden_state"][-1]
+        hidden_state_cls = outputs["last_hidden_state"][:,-1]
         return hidden_state_cls
 
 class EnsembleModel(torch.nn.Module):
@@ -61,7 +80,7 @@ class EnsembleModel(torch.nn.Module):
         list_logits = []
         for i in range(len(self.list_models)):
             model = self.list_models[i]
-            logits = model(**x[i])[0] # TODO: wrapper for models because of [0]
+            logits = model(x[i])
             list_logits.append(logits)
         tmp = torch.cat(list_logits, axis=1)
         logits = self.layer_linear(tmp)

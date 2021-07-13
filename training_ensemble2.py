@@ -8,6 +8,13 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Adam
 import utils
 import models
 
+list_configs = [
+    "facebook/bart-base",
+    "bert-base-uncased",
+    "vinai/bertweet-base",
+    "xlnet-base-cased",
+]
+
 def main(args):
     # get data
     if args.verbose: print("reading data...")
@@ -19,7 +26,7 @@ def main(args):
     # get tokenizers
     if args.verbose: print("loading tokenizers...")
     list_tokenizers = []
-    for config in args.configs:
+    for config in list_configs:
         tokenizer = AutoTokenizer.from_pretrained(config)
         list_tokenizers.append(tokenizer)
     
@@ -48,13 +55,15 @@ def main(args):
     # get model
     if args.verbose: print("loading models...")
     list_models = []
-    for config, path_checkpoint in zip(args.configs, args.checkpoints):
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained(config, num_labels=2)
-        model = models.HuggingfaceModel(model_huggingface)
-        checkpoint = torch.load(path_checkpoint, map_location=device)
-        model.load_state_dict(checkpoint["model_state_dict"])
-        list_models.append(model)
-    model = models.EnsembleModel(list_models, args.freeze_models, size_hidden_state=2)
+    checkpoint_bart = torch.load(args.checkpoints[0], map_location=device)
+    list_models.append(models.BartModelForEnsemble(checkpoint_bart["model_state_dict"]))
+    checkpoint_bert = torch.load(args.checkpoints[1], map_location=device)
+    list_models.append(models.BertModelForEnsemble(checkpoint_bert["model_state_dict"]))
+    checkpoint_bertweet = torch.load(args.checkpoints[2], map_location=device)
+    list_models.append(models.BertweetModelForEnsemble(checkpoint_bertweet["model_state_dict"]))
+    checkpoint_xlnet = torch.load(args.checkpoints[3], map_location=device)
+    list_models.append(models.XLNetModelForEnsemble(checkpoint_xlnet["model_state_dict"]))
+    model = models.EnsembleModel(list_models, args.freeze_models, size_hidden_state=768)
     model.to(device)
 
     # define loss function
@@ -81,10 +90,8 @@ if __name__ == "__main__":
         help='directory where model checkpoints should be stored', action='store')
     parser.add_argument('-v', '--verbose', 
         help='set for verbose output', action='store_true')
-    parser.add_argument('-c', '--configs', nargs="+", 
-        help='list of huggingface configs to use')
     parser.add_argument('-ckpts', '--checkpoints', nargs="+", 
-        help='path to pretrained models that should be used')
+        help='path to pretrained models that should be used; order must be bart, bert, bertweet, xlnet')
     parser.add_argument('-fm', '--freeze_models', 
         help='set to freeze submodules', action='store_true')
 
