@@ -12,4 +12,8 @@ In order to run our experiments for the baselines, first make sure that the nece
 - run glove.py to create GloVe embeddings. This script runs multiple pre-defined experiments, each constructing GloVe embeddings a bit differently. The embeddings are placed in Embeddings/.
 - run predictions.py. This will run several pre-defined experiments, each combines a vectorizer and a classification model to create predictions which can then be uploaded to Kaggle. The predictions are placed in ../Predictions. The script also outputs training and validation accuracy for each experiment.
 
+Download and unpack GloVe embeddings: 
+```
+wget https://nlp.stanford.edu/data/glove.twitter.27B.zip
+```
 

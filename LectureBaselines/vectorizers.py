@@ -3,26 +3,27 @@
 # imports
 import numpy as np
 import pickle
+import pandas as pd
 
-# average word embeddings in each tweet, adapte from
+# average word embeddings in each tweet, adapted from
 # https://edumunozsala.github.io/BlogEms/jupyter/nlp/classification/embeddings/python/2020/08/15/Intro_NLP_WordEmbeddings_Classification.html
 class AverageGlove:
-  def __init__(self, embeddings, vocab):
+  def __init__(self, embeddings):
     ''' 
     Args: 
       embeddings : path to glove embeddings
       vocab : path to pickled vocab
     '''
-    # load embeddings
-    xs = np.load(embeddings)['x']
-    ys = np.load(embeddings)['y'] 
-    # load vocab
-    with open(vocab, 'rb') as f:
-        vocab = pickle.load(f)
-    # build word to embedding dict
-    self.word_vectors = {}
-    for word in vocab:
-        self.word_vectors[word] = np.concatenate((xs[vocab.get(word)], ys[vocab.get(word)]), axis=0)
+    # load embeddings, adapted from https://stackoverflow.com/questions/66380331/how-do-i-create-a-dictionary-from-a-txt-file-with-whitespace-in-python
+    lines = []                                                                                                                         
+    with open(embeddings, 'r') as f: 
+      lines = f.readlines()
+    strip_list = [line.replace('\n','').split(' ') for line in lines if line != '\n']
+    
+    # build dict to look up embeddings
+    self.word_vectors = dict()
+    for strip in strip_list: 
+      self.word_vectors[strip[0]] = np.array(strip[1:]).astype(float)
 
   def fit(self, data):
     pass

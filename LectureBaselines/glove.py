@@ -97,7 +97,7 @@ for dataset in DATASETS:
         pickle.dump(cooc, f, pickle.HIGHEST_PROTOCOL)
 
     # learning embeddings
-    print("Lerning embeddings for " + dataset['name'] + " using nmax =", dataset['nmax'], "while cooc.max() =", cooc.max())
+    print("Learning embeddings for " + dataset['name'] + " using nmax =", dataset['nmax'], "while cooc.max() =", cooc.max())
     print("cooc shape 0: ", cooc.shape[0], "cooc shape 1: ", cooc.shape[1])
     xs = np.random.normal(size=(cooc.shape[0], dataset['embedding_dimension']))
     ys = np.random.normal(size=(cooc.shape[1], dataset['embedding_dimension']))

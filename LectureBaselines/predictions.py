@@ -21,32 +21,35 @@ EXPERIMENTS = [
         'test_data' : '../Data/test_data.txt',
         'model' : LogisticRegression(C=1e5, max_iter=500),
         'vectorizer' : CountVectorizer(max_features=5000)
-    }, 
-    {
-        'name' : 'small_basic_count_vectorizer', 
-        'neg_data' : '../Data/train_neg_basic.txt', 
-        'pos_data' : '../Data/train_pos_basic.txt',
-        'test_data' : '../Data/test_data_basic.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : CountVectorizer(max_features=5000)
-    }, 
-    {
-        'name' : 'small_glove', 
-        'neg_data' : '../Data/train_neg.txt', 
-        'pos_data' :'../Data/train_pos.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/small.npz', 'Vocabs/small.pkl')
-    }, 
+    },
     {
         'name' : 'small_basic_glove', 
         'neg_data' : '../Data/train_neg_basic.txt', 
         'pos_data' :'../Data/train_pos_basic.txt',
         'test_data' : '../Data/test_data_basic.txt',
         'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/small_basic.npz', 'Vocabs/small_basic.pkl')
+        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.25d.txt')
     }
     ]
+    
+    # , 
+    # {
+    #     'name' : 'small_basic_count_vectorizer', 
+    #     'neg_data' : '../Data/train_neg_basic.txt', 
+    #     'pos_data' : '../Data/train_pos_basic.txt',
+    #     'test_data' : '../Data/test_data_basic.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : CountVectorizer(max_features=5000)
+    # }, 
+    # {
+    #     'name' : 'small_glove', 
+    #     'neg_data' : '../Data/train_neg.txt', 
+    #     'pos_data' :'../Data/train_pos.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/small.npz', 'Vocabs/small.pkl')
+    # }, 
+    
 
 # Custom function for loading data here
 def load_tweets(filename, label):
