@@ -7,6 +7,7 @@
 # imports
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 import vectorizers
 import numpy as np
 import random
@@ -23,61 +24,69 @@ EXPERIMENTS = [
         'vectorizer' : CountVectorizer(max_features=5000)
     },
     {
-        'name' : 'count_vectorizer_full_25d', 
-        'neg_data' : '../Data/train_neg_full.txt', 
-        'pos_data' : '../Data/train_pos_full.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : CountVectorizer(max_features=5000)
-    },
-    {
-        'name' : 'glove', 
+        'name' : 'tf_idf_vectorizer', 
         'neg_data' : '../Data/train_neg.txt', 
-        'pos_data' :'../Data/train_pos.txt',
+        'pos_data' : '../Data/train_pos.txt',
         'test_data' : '../Data/test_data.txt',
         'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.25d.txt')
-    },
-    {
-        'name' : 'glove_full_25d', 
-        'neg_data' : '../Data/train_neg_full.txt', 
-        'pos_data' :'../Data/train_pos_full.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.25d.txt')
-    },
-    {
-        'name' : 'glove_full_50d', 
-        'neg_data' : '../Data/train_neg_full.txt', 
-        'pos_data' :'../Data/train_pos_full.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.50d.txt')
-    },
-    {
-        'name' : 'glove_full_100d', 
-        'neg_data' : '../Data/train_neg_full.txt', 
-        'pos_data' :'../Data/train_pos_full.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.100d.txt')
-    },
-    {
-        'name' : 'glove_full_200d', 
-        'neg_data' : '../Data/train_neg_full.txt', 
-        'pos_data' :'../Data/train_pos_full.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
-    },
-    {
-        'name' : 'glove_full_200d_preprocessed', 
-        'neg_data' : '../Data/train_neg_full_glove.txt', 
-        'pos_data' :'../Data/train_pos_full_glove.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
+        'vectorizer' : TfidfVectorizer(max_features=5000)
     }
+    #, {
+    #     'name' : 'count_vectorizer_full_25d', 
+    #     'neg_data' : '../Data/train_neg_full.txt', 
+    #     'pos_data' : '../Data/train_pos_full.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : CountVectorizer(max_features=5000)
+    # },
+    # {
+    #     'name' : 'glove', 
+    #     'neg_data' : '../Data/train_neg.txt', 
+    #     'pos_data' :'../Data/train_pos.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.25d.txt')
+    # },
+    # {
+    #     'name' : 'glove_full_25d', 
+    #     'neg_data' : '../Data/train_neg_full.txt', 
+    #     'pos_data' :'../Data/train_pos_full.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.25d.txt')
+    # },
+    # {
+    #     'name' : 'glove_full_50d', 
+    #     'neg_data' : '../Data/train_neg_full.txt', 
+    #     'pos_data' :'../Data/train_pos_full.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.50d.txt')
+    # },
+    # {
+    #     'name' : 'glove_full_100d', 
+    #     'neg_data' : '../Data/train_neg_full.txt', 
+    #     'pos_data' :'../Data/train_pos_full.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.100d.txt')
+    # },
+    # {
+    #     'name' : 'glove_full_200d', 
+    #     'neg_data' : '../Data/train_neg_full.txt', 
+    #     'pos_data' :'../Data/train_pos_full.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
+    # },
+    # {
+    #     'name' : 'glove_full_200d_preprocessed', 
+    #     'neg_data' : '../Data/train_neg_full_glove.txt', 
+    #     'pos_data' :'../Data/train_pos_full_glove.txt',
+    #     'test_data' : '../Data/test_data.txt',
+    #     'model' : LogisticRegression(C=1e5, max_iter=500),
+    #     'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
+    # }
 ]
     
 
