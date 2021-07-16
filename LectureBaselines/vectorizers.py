@@ -12,7 +12,6 @@ class AverageGlove:
     ''' 
     Args: 
       embeddings : path to glove embeddings
-      vocab : path to pickled vocab
     '''
     # load embeddings, adapted from https://stackoverflow.com/questions/66380331/how-do-i-create-a-dictionary-from-a-txt-file-with-whitespace-in-python
     lines = []                                                                                                                         
