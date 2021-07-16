@@ -1,6 +1,5 @@
 # Ruby 2.0
-# Reads stdin: ruby -n preprocess-twitter.rb
-#
+# Reads stdin: ruby -n glove_preprocessing.rb
 # Script for preprocessing tweets by Romain Paulus
 # with small modifications by Jeffrey Pennington
 
