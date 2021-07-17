@@ -3,7 +3,7 @@ import numpy as np
 import re
 import argparse
 
-# The dataset that you should use with this script can be find here: https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv
+# The dataset that you should use with this script can be found here: https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv
 # It is from a kaggle competition "Tweet Sentiment Extraction"
 # We keep only pos/neg tweets (not neutral) 
 
@@ -31,7 +31,6 @@ def format_dataset(data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: a dataframe containting tweets and sentiment (pos/neg only) 
     """
     data = data[['text', 'sentiment']]
-    
     return data.loc[data['sentiment'] != "neutral"]
 
 def pre_processing(tweet: str) -> str:
@@ -45,7 +44,6 @@ def pre_processing(tweet: str) -> str:
     """
     tweet = re.sub('@[^\s]+','<user>',tweet)
     tweet = re.sub(r'http\S+', '<url>', tweet)
-
     return tweet
 
 def create_datasets(data: pd.DataFrame):
@@ -62,7 +60,6 @@ def create_datasets(data: pd.DataFrame):
     negative_tweet.to_csv("Data/" + output_path_neg, header=None, index=None, sep=',', mode='a',)
 
     return
-
 
 def main(args):
     dataFrame = read_dataset(args.input_path)
