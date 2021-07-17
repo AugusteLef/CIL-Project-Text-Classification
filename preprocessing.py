@@ -138,6 +138,19 @@ def remove_punctuation(tweet: str) -> str:
     tweet = "".join([char for char in tweet if char not in string.punctuation])
     return tweet
 
+def data_augmentation(tweet: str) -> str:
+    """ Creates a new tweet replacing a word by its synonym using the Thesaurus-based subsititution
+
+    Args:
+        tweet (string): tweet as string
+
+    Returns:
+        string: new augmented tweet
+    """
+    # try with 2 words instead of 3 as well, might be better?
+    augmented_tweet = utils.synonym_replacement(tweet, 3)
+    return augmented_tweet
+
 def main(args):
     """ runs the whole preprocessing pipeline according to command line arguments
 
@@ -151,6 +164,12 @@ def main(args):
     # basic preprocessing
     if args.verbose: print("basic processing...")
     df['tweet'] = df['tweet'].apply(lambda row: basic_preprocess(str(row)))
+    #data augmentation
+    if args.augmentation:
+        if args.verbose: print("processing: data augmentation...")
+        augmentation = pd.DataFrame(columns=['tweet'])
+        augmentation['tweet'] = df['tweet'].apply(lambda row: data_augmentation((str(row))))
+        df = pd.concat([df, augmentation], ignore_index=True, sort=False)
     # contractions
     if args.verbose: print("processing: replace contraction...")
     df['tweet'] = df['tweet'].apply(lambda row: replace_contractions(str(row)))
@@ -187,6 +206,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--stemming', dest='stemming', help='do you want to stemm tweet?', action='store_true')
     parser.add_argument('-l', '--lemmatizing', dest='lemmatizing', help='do you want to lemmatize tweet?', action='store_true')
     parser.add_argument('-sw', '--stop_words', dest='stop_words', help='do you to remove stop words?', action='store_true')
+    parser.add_argument('-a', '--augmentation', dest='augmentation', help='want to do data augmentation?', action='store_true')
     parser.add_argument('-v', '--verbose', dest='verbose', help='want verbose output or not?', action='store_true')
     args = parser.parse_args()
     main(args)
