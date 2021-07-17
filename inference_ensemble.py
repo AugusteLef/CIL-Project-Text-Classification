@@ -21,8 +21,8 @@ def main(args):
     # get tokenizers
     if args.verbose: print("loading tokenizers...")
     list_tokenizers = []
-    for checkpoint in args.checkpoints_tokenizers:
-        tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+    for config in args.configs:
+        tokenizer = AutoTokenizer.from_pretrained(config)
         list_tokenizers.append(tokenizer)
     
     # build dataloader
@@ -39,8 +39,9 @@ def main(args):
     # build model
     if args.verbose: print("loading models...")
     list_models = []
-    for checkpoint in args.checkpoints_models:
-        model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+    for config in args.configs:
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained(config, num_labels=2)
+        model = models.HuggingfaceModel(model_huggingface)
         list_models.append(model)
     model = models.EnsembleModel(list_models)
     
@@ -79,10 +80,8 @@ if __name__ == "__main__":
         help='path to write output to', action='store')
     parser.add_argument('-v', '--verbose', dest='verbose', 
         help='want verbose output or not?', action='store_true')
-    parser.add_argument('-ckptst', '--checkpoints_tokenizers', nargs="+", 
-        help='path to pretrained tokenizers that should be used')
-    parser.add_argument('-ckptsm', '--checkpoints_models', nargs="+", 
-        help='path to pretrained models that should be used')
+    parser.add_argument('-c', '--configs', nargs="+", 
+        help='list of huggingface configs to use')
     parser.add_argument('-ckpt', '--checkpoint', type=str, 
         help='path to pretrained model that should be used')
 
