@@ -36,6 +36,38 @@ The dataset should contain the following files:
 - train_neg_full.txt: the full negative training samples
 - train_pos_full.txt: the full positive training samples
 
+
+## Additional Datasets
+Download the tweet datasets:
+```
+wget [download link]
+```
+
+Match the format of the original dataset and create a positive and negative datasets (save them in Data/):
+- For the dataset from [Tweet Sentiment Extraction](https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv)
+
+```
+python3 additional_data_set_1.py dataset1.csv
+
+```
+- For the dataset from [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv)
+```
+python3 additional_data_set_2.py dataset2.csv
+
+```
+Combine all datasets:
+- for negative:
+```
+python3 combine_datasets.py Data/train_neg_full.txt Data/train_neg_add1.txt Data/train_neg_add2.txt train_neg_all_full.txt
+
+```
+- for positive:
+```
+python3 combine_datasets.py Data/train_pos_full.txt Data/train_pos_add1.txt Data/train_pos_add2.txt train_pos_all_full.txt
+
+```
+
+
 ## General Workflow
 
 Download and store pretrained models from huggingface & nltk data (run this on login node!):
