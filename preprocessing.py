@@ -1,8 +1,14 @@
+# This script is used for preprocessing. Different preprocessing options can be specified using command-line flags.
+
 # packages
 import argparse
 import re
 import string
 import json
+import requests
+import bs4
+import nltk
+import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -11,6 +17,28 @@ from nltk.tokenize import TweetTokenizer
 
 # import custom utils
 import utils
+
+# load nltk data
+print("Loading nltk data...")
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+
+# load slang json
+print("Loading myslang.json...")
+resp = requests.get("http://www.netlingo.com/acronyms.php")
+soup = bs4.BeautifulSoup(resp.text, "html.parser")
+slangdict = {}
+key = ""
+value = ""
+for div in soup.findAll('div', attrs={'class': 'list_box3'}):
+    for li in div.findAll('li'):
+        for a in li.findAll('a'):
+            key = a.text
+            value = li.text.split(key)[1]
+            slangdict[key] = value
+with open('Preprocessing_Data/myslang.json', 'w') as f:
+    json.dump(slangdict, f, indent=2)
 
 # load wordlists into global variables
 STOP_WORDS = set(stopwords.words('english'))
