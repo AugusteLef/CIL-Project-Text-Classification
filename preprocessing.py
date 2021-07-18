@@ -16,7 +16,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import TweetTokenizer
 
 # import custom utils
-import utils
+import utils_preprocessing
 
 # load nltk data
 print("Loading nltk data...")
@@ -176,7 +176,7 @@ def data_augmentation(tweet: str) -> str:
         string: new augmented tweet
     """
     # try with 2 words instead of 3 as well, might be better?
-    augmented_tweet = utils.synonym_replacement(tweet, 3)
+    augmented_tweet = utils_preprocessing.synonym_replacement(tweet, 3)
     return augmented_tweet
 
 def main(args):
@@ -187,7 +187,7 @@ def main(args):
     """   
     # reading data
     if args.verbose: print("reading input from %s..." % args.input_path)
-    df = utils.load_raw_data(args.input_path)
+    df = utils_preprocessing.load_raw_data(args.input_path)
     print("number of tweets: %s" % len(df))   
     # basic preprocessing
     if args.verbose: print("basic processing...")

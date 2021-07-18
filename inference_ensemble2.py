@@ -1,10 +1,13 @@
+# inference script for ensemble 2 (using last transformer layer output)
+
 import os
 import torch
 import argparse
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
-import utils
+# custom file imports
+import utils_training_inference as utils
 import models
 
 def main(args):
@@ -89,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument('-ckpt', '--checkpoint', type=str, 
         help='path to pretrained model that should be used')
 
-    # inference
+    # inference parameters
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=32)
 

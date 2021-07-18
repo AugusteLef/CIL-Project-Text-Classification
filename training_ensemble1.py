@@ -1,14 +1,20 @@
+# training script for ensemble 1 (using classifier head outputs)
+
 import os
 import torch
 import argparse
-import random
-import pandas as pd
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, AdamW
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-import utils
+# custom file imports 
+import utils_training_inference as utils
 import models
 
 def main(args):
+    """ main training routine
+
+    Args:
+        args: command line arguments
+    """
     # get data
     if args.verbose: print("reading data...")
     texts_train, labels_train, texts_test, labels_test = utils.get_data_training(args.neg_data, args.pos_data, args.split)
@@ -106,8 +112,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # set seeds
-    torch.manual_seed(args.seed)
-    random.seed(args.seed)
+    utils.seed_everything(seed = args.seed)
 
     # start training
     main(args)

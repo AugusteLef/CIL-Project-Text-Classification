@@ -7,14 +7,15 @@ Some scripts may assume the following file-structure:
 - LectureBaselines : Directory containing implementations of the baselines from the exercises. A separate ReadMe can be found here.
 
 The following scripts should be contained in the main project folder:
-- preloading.py : Downloads models from huggingface and data for nltk library.
 - preprocessing.py : Used for preprocessing data-sets with different preprocessing methods.
-- training.py : Used to fine-tune a pretrained model on preprocessed datasets.
-- inference.py : Used to create predictions for test-set using a fine-tuned model.
-- utils.py : Contains some useful code-snippets used in the above scripts.
+- training_*.py : Training scripts for huggingface models and our ensemble models.
+- inference_*.py : Scripts used to create predictions for the test set.
+- utils_*.py : Contains some useful code-snippets used in the above scripts.
 
 
 ## Dataset
+
+TODO: Add polybox link that leads to preprocessed datasets we use in experiments.
 
 Download the tweet dataset:
 ```
@@ -44,13 +45,13 @@ wget [download link]
 ```
 
 Match the format of the original dataset and create a positive and negative datasets (save them in Data/):
-- For the dataset from [Tweet Sentiment Extraction](https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv)
-
+- For the dataset from [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv)
 ```
 python3 additional_data_set_1.py dataset1.csv
 
 ```
-- For the dataset from [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv)
+- For the dataset from [Tweet Sentiment Extraction](https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv)
+
 ```
 python3 additional_data_set_2.py dataset2.csv
 
@@ -70,17 +71,13 @@ python3 combine_datasets.py Data/train_pos_full.txt Data/train_pos_add1.txt Data
 
 ## General Workflow
 
-Download and store pretrained models from huggingface & nltk data (run this on login node!):
-```
-python3 preloading.py
-```
-Apply preprocessing scripts to raw data to build files of preprocessed data (on compute node):
+Apply preprocessing scripts to raw data to build files of preprocessed data:
 ```
 python3 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
 
 python3 preprocessing.py Data/train_neg.txt Data/train_neg_basic.txt -v
 ```
-Train on preprocessed data and save trained model (compute node):
+Train on preprocessed data and save trained model:
 ```
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bart-base_basic -pm Pretrained_Models/bart-base/ -v
 
@@ -88,7 +85,7 @@ python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/ber
 
 python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/xlnet-base-cased_basic -pm Pretrained_Models/xlnet-base-cased/ -v -x
 ```
-Create predictions for test-data (compute node):
+Create predictions for test-data:
 ```
 python3 inference.py Data/test_data_basic.txt Predictions/bart-base_basic.csv -dt Pretrained_Models/bart-base/ -dm Models/bart-base_basic/checkpoint_3 
 
@@ -139,13 +136,4 @@ bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" python3 main.py [args]
 Monitoring job:
 ```
 bbjobs
-```
-
-## IMDB Dataset on Leonhard
-```
-wget http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
-
-mv aclImdb $SCRATCH/
-
-tar -xf aclImdb_v1.tar.gz
 ```

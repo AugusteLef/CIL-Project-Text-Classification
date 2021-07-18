@@ -1,17 +1,20 @@
+# inference script for ensemble 1 (using classifier head outputs)
+
 import os
 import torch
 import argparse
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
-import utils
+# custom file imports 
+import utils_training_inference as utils
 import models
 
 def main(args):
-    """ creates predictions for given data using given model
+    """ creates predictions for given data using given ensemble1 model
 
     Args:
-        command-line arguments containing path to model, data etc.
+        command-line arguments
     """
     # get data
     if args.verbose: print("reading data...")
@@ -85,7 +88,7 @@ if __name__ == "__main__":
     parser.add_argument('-ckpt', '--checkpoint', type=str, 
         help='path to pretrained model that should be used')
 
-    # inference
+    # inference parameters
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=32)
 

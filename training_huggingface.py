@@ -1,18 +1,19 @@
+# training script for huggingface models
+
 import os
 import torch
 import argparse
-import random
-import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-import utils
+# custom file imports 
+import utils_training_inference as utils
 import models
 
 def main(args):
     """ main training routine
 
     Args:
-        args: command line arguments containing paths to training data, pretrained model, output location etc.
+        args: command line arguments
     """
     # get data
     if args.verbose: print("reading data...")
@@ -23,7 +24,7 @@ def main(args):
     
     # get tokenizer
     if args.verbose: print("loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model) 
+    tokenizer = AutoTokenizer.from_pretrained(args.config) 
     
     # build dataloaders
     collate_fn = utils.TextCollator(tokenizer)
@@ -46,7 +47,7 @@ def main(args):
 
     # get model
     if args.verbose: print("loading model...")
-    model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.pretrained_model, num_labels=2)
+    model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.config, num_labels=2)
     model = models.HuggingfaceModel(model_huggingface)
     
     # define loss function
@@ -78,8 +79,8 @@ if __name__ == "__main__":
         help='directory where checkpoints should be stored', action='store')
     parser.add_argument('-v', '--verbose', dest='verbose', 
         help='want verbose output or not?', action='store_true')
-    parser.add_argument('-pm', '--pretrained_model', dest='pretrained_model', type=str, 
-        help='path to pretrained model that should be used', default='Pretrained_Models/bart-base')
+    parser.add_argument('-c', '--config', type=str, 
+        help='huggingface config to use')
 
     # training arguments
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
@@ -99,8 +100,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # set seeds
-    torch.manual_seed(args.seed)
-    random.seed(args.seed)
+    utils.seed_everything(seed = args.seed)
 
     # start training
     main(args)

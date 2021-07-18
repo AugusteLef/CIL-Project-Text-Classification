@@ -1,3 +1,5 @@
+# this file contains various models used in the training and inference scripts
+
 import torch
 from transformers import AutoModelForSequenceClassification
 

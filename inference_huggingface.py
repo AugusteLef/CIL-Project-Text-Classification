@@ -1,17 +1,20 @@
+# inference script for huggingface models BART, BERT, BERTweet, XLNet 
+
 import os
 import torch
 import argparse
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import pandas as pd
 
-import utils
+# custom file imports 
+import utils_training_inference as utils
 import models
 
 def main(args):
     """ creates predictions for given data using given model
 
     Args:
-        command-line arguments containing path to model, data etc.
+        command-line arguments
     """
     # get data
     if args.verbose: print("reading data...")
@@ -20,7 +23,7 @@ def main(args):
 
     # get the tokenizer
     if args.verbose: print("loading tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(args.dir_tokenizer) 
+    tokenizer = AutoTokenizer.from_pretrained(args.config) 
 
     # build dataloader
     collate_fn = utils.TextCollator(tokenizer)
@@ -35,7 +38,7 @@ def main(args):
 
     # build model
     if args.verbose: print("loading model...")
-    model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.dir_model, num_labels=2)
+    model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.config, num_labels=2)
     model = models.HuggingfaceModel(model_huggingface)
     
     # use gpu if possible
@@ -73,14 +76,12 @@ if __name__ == "__main__":
         help='path to write output to', action='store')
     parser.add_argument('-v', '--verbose', dest='verbose', 
         help='want verbose output or not?', action='store_true')
-    parser.add_argument('-dt', '--dir_tokenizer', dest='dir_tokenizer', type=str, 
-        help='directory containing tokenizer')
-    parser.add_argument('-dm', '--dir_model', dest='dir_model', type=str, 
-        help='directory containing model')
+    parser.add_argument('-c', '--config', type=str,
+        help='huggingface config to use')
     parser.add_argument('-ckpt', '--checkpoint', type=str, 
         help='path to pretrained model that should be used')
 
-    # inference
+    # inference parameters
     parser.add_argument('-bs', '--batch_size', dest='batch_size', type=int, 
         help='size of batches for prediction', action='store', default=16)
 
