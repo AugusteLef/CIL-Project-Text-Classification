@@ -1,11 +1,11 @@
 import os
-import pandas as pd
 import random
 import torch
+import pandas as pd
+import numpy as np
+
 from transformers import AdamW
 from nltk.corpus import wordnet
-import random
-from random import shuffle
 
 stop_words = ['i', 'me', 'my', 'myself', 'we', 'our',
 			'ours', 'ourselves', 'you', 'your', 'yours',
@@ -29,6 +29,19 @@ stop_words = ['i', 'me', 'my', 'myself', 'we', 'our',
 			'very', 's', 't', 'can', 'will', 'just', 'don',
 			'should', 'now', '']
 
+# taken from: https://datascience.stackexchange.com/questions/66345/why-ml-model-produces-different-results-despite-random-state-defined-and-how-to
+def seed_everything(seed=42, pytorch=True):
+    """"
+        Seed everything.
+    """   
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    if pytorch:
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
 
 def load_raw_data(path: str) -> pd.DataFrame:
     """Create a Dataframe containing each tweet

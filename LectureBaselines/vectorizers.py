@@ -1,9 +1,7 @@
-# This file contains custom vectorizers that can be used in the experiments in predictions.py.
+# This file contains a custom vectorizers that we use for the glove experiments in predictions.py.
 
 # imports
 import numpy as np
-import pickle
-import pandas as pd
 
 # average word embeddings in each tweet, adapted from
 # https://edumunozsala.github.io/BlogEms/jupyter/nlp/classification/embeddings/python/2020/08/15/Intro_NLP_WordEmbeddings_Classification.html
@@ -33,6 +31,8 @@ class AverageGlove:
     X = np.zeros((len(data), D))
     n = 0
     emptycount = 0
+
+    # average word embeddings of every tweet, some words might not have an embedding
     for tweet in data:
       tokens = [t for t in tweet.strip().split()]
       sum = np.zeros(D)

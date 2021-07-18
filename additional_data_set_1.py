@@ -1,15 +1,15 @@
+# Script for loading the first additional dataset. 
+# The dataset that you should use with this script can be found here:
+# https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv
+# It is from a kaggle competition "Sentiment140 dataset with 1.6 million tweets".
+
 import pandas as pd
-import numpy as np 
 import re
 import argparse
 
-# The dataset that you should use with this script can be found here: https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv
-# It is from a kaggle competition "Tweet Sentiment Extraction"
-# We keep only pos/neg tweets (not neutral) 
-
 #GLOBAL VARIABLES
-output_path_pos = "train_pos_add1.txt"
-output_path_neg = "train_neg_add1.txt"
+output_path_pos = "Data/train_pos_add1.txt"
+output_path_neg = "Data/train_neg_add1.txt"
 
 def read_dataset(path: str) -> pd.DataFrame:
     """read the dataset and store it in a DataFrame
@@ -17,21 +17,26 @@ def read_dataset(path: str) -> pd.DataFrame:
     Args:
         path (str): dataset from https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv
     """
-    data = pd.read_csv(path)
+    data = pd.read_csv(path, encoding = "ISO-8859-1", header=None)
     return data
 
-
 def format_dataset(data: pd.DataFrame) -> pd.DataFrame:
-    """give the correct format to the dataframe (keep only useful columns) and keep only pos/neg tweets
+    """give the correct format to the dataframe (keep only useful columns)
 
     Args:
         data (pd.DataFrame): The dataframe to be formated
 
     Returns:
-        pd.DataFrame: a dataframe containting tweets and sentiment (pos/neg only) 
+        pd.DataFrame: a dataframe with the correct format (tweet and sentiment)
     """
-    data = data[['text', 'sentiment']]
-    return data.loc[data['sentiment'] != "neutral"]
+    data = data[[0, 5]]
+    col_list = list(data)
+    col_list[0], col_list[1] = col_list[1], col_list[0]
+    data.columns = col_list
+    data = data.rename(columns={data.columns[0]: "sentiment", data.columns[1]: "text"})
+    data = data[['text','sentiment']]
+    
+    return data
 
 def pre_processing(tweet: str) -> str:
     """Remove user and url as in the official datasets
@@ -44,6 +49,7 @@ def pre_processing(tweet: str) -> str:
     """
     tweet = re.sub('@[^\s]+','<user>',tweet)
     tweet = re.sub(r'http\S+', '<url>', tweet)
+
     return tweet
 
 def create_datasets(data: pd.DataFrame):
@@ -53,11 +59,11 @@ def create_datasets(data: pd.DataFrame):
         data (pd.DataFrame): dataframe of 2 columns (tweet and sentiment) used to create the 2 training datasets
     """
     
-    positive_tweet = data.loc[data['sentiment'] == "positive"][['text']]
-    negative_tweet = data.loc[data['sentiment'] == "negative"][['text']]
+    positive_tweet = data.loc[data['sentiment'] == 4][['text']]
+    negative_tweet = data.loc[data['sentiment'] == 0][['text']]
     
-    positive_tweet.to_csv("Data/" + output_path_pos, header=None, index=None, sep=',', mode='a',)
-    negative_tweet.to_csv("Data/" + output_path_neg, header=None, index=None, sep=',', mode='a',)
+    positive_tweet.to_csv(output_path_pos, header=None, index=None, sep=',', mode='a',)
+    negative_tweet.to_csv(output_path_neg, header=None, index=None, sep=',', mode='a',)
 
     return
 

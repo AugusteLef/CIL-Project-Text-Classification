@@ -1,3 +1,6 @@
+# preprocessing script from: https://nlp.stanford.edu/projects/glove/
+
+# Original header:
 # Ruby 2.0
 # Reads stdin: ruby -n glove_preprocessing.rb
 # Script for preprocessing tweets by Romain Paulus

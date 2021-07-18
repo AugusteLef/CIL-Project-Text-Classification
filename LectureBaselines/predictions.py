@@ -2,7 +2,7 @@
 # different Vectorizers and Models can be combined and trained on different datasets here. For GloVe
 # experiments, the GloVe embeddings first have to be computed with the glove.py script. Our custom Vectorizers
 # can be found in the vectorizer.py file. This file is heavily based on the notebook for the introduction of project 2
-# in the CIL lecture.
+# in the CIL lecture: https://colab.research.google.com/github/dalab/lecture_cil_public/blob/master/exercises/2021/Project_2.ipynb.
 
 # imports
 from sklearn.linear_model import LogisticRegression
@@ -89,7 +89,6 @@ EXPERIMENTS = [
     }
 ]
     
-
 # Custom function for loading data here
 def load_tweets(filename, label):
         with open(filename, 'r', encoding='utf-8') as f:
