@@ -146,7 +146,7 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
         None
     """
     optimizer = AdamW(model.parameters(), lr=5e-5)
-    scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
+    # scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
     for epoch in range(args.epochs):
         model.train()
         avg_loss = 0.0
@@ -159,11 +159,13 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
                 preds = model(**inputs)
                 loss = fn_loss(preds, labels)
                 loss /= args.accumulation_size
-            scaler.scale(loss).backward()
+            # scaler.scale(loss).backward()
+            loss.backward()
             avg_loss += loss.item()
             if (i + 1) % args.accumulation_size == 0:
-                scaler.step(optimizer)
-                scaler.update()
+                # scaler.step(optimizer)
+                # scaler.update()
+                optimizer.step()
                 optimizer.zero_grad() 
                 if args.verbose:
                     print(

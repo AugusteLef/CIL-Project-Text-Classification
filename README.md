@@ -71,20 +71,65 @@ python3 combine_datasets.py Data/train_pos_full.txt Data/train_pos_add1.txt Data
 
 ## General Workflow
 
-Apply preprocessing scripts to raw data to build files of preprocessed data:
+### Preprocessing
 ```
-python3 preprocessing.py Data/train_pos.txt Data/train_pos_basic.txt -v
+python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_basic.txt -v
 
-python3 preprocessing.py Data/train_neg.txt Data/train_neg_basic.txt -v
-```
-Train on preprocessed data and save trained model:
-```
-python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bart-base_basic -pm Pretrained_Models/bart-base/ -v
+python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_basic.txt -v
 
-python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/bert-base-uncased_basic -pm Pretrained_Models/bert-base-uncased/ -v
+python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_augmented.txt -v -a
 
-python3 training.py Data/train_neg_basic.txt Data/train_pos_basic.txt Models/xlnet-base-cased_basic -pm Pretrained_Models/xlnet-base-cased/ -v -x
+python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_augmented.txt -v -a
+
+python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_pp.txt -v -s -l -sw
+
+python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_pp.txt -v -s -l -sw
 ```
+### Training
+```
+bsub -W 24:00 -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" -oo Output/BART_raw.out 
+```
+raw-data
+```
+python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bart_raw
+
+python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bert_raw
+
+python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bertweet_raw
+
+python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/xlnet_raw
+```
+preprocessed-data
+```
+python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/xlnet_pp
+
+python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bert_pp
+
+python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bart_pp
+
+python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bertweet_pp
+```
+augmented-data
+```
+python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bert_augmented
+
+python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bart_augmented
+
+python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/xlnet_augmented
+
+python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bertweet_augmented
+```
+additional-data
+```
+python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bert_all
+
+python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bart_all
+
+python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bertweet_all
+
+python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/xlnet_all
+```
+
 Create predictions for test-data:
 ```
 python3 inference.py Data/test_data_basic.txt Predictions/bart-base_basic.csv -dt Pretrained_Models/bart-base/ -dm Models/bart-base_basic/checkpoint_3 
