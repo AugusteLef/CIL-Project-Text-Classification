@@ -5,7 +5,7 @@ import argparse
 import pandas as pd
 
 # custom file imports
-import utils
+import utils_preprocessing as utils
 
 def combine(path1: str, path2: str, path3: str) -> pd.DataFrame:
     """Combine 3 differents sets of tweets into one. 

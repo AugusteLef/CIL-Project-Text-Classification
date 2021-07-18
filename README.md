@@ -47,13 +47,13 @@ wget [download link]
 Match the format of the original dataset and create a positive and negative datasets (save them in Data/):
 - For the dataset from [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv)
 ```
-python3 additional_data_set_1.py dataset1.csv
+python3 additional_dataset_1.py dataset1.csv
 
 ```
 - For the dataset from [Tweet Sentiment Extraction](https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv)
 
 ```
-python3 additional_data_set_2.py dataset2.csv
+python3 additional_dataset_2.py dataset2.csv
 
 ```
 Combine all datasets:
