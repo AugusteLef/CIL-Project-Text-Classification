@@ -155,10 +155,10 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
             labels = batch["labels"]
             inputs = move_to_device(inputs, device)
             labels = move_to_device(labels, device)
-            with torch.cuda.amp.autocast(enabled=args.mixed_precision):
-                preds = model(**inputs)
-                loss = fn_loss(preds, labels)
-                loss /= args.accumulation_size
+            # with torch.cuda.amp.autocast(enabled=args.mixed_precision):
+            preds = model(**inputs)
+            loss = fn_loss(preds, labels)
+            loss /= args.accumulation_size
             # scaler.scale(loss).backward()
             loss.backward()
             avg_loss += loss.item()
