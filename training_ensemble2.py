@@ -110,7 +110,7 @@ if __name__ == "__main__":
     parser.add_argument('-as', '--accumulation_size', dest='accumulation_size', type=int, 
         help='reduces memory usage, if larger', action='store', default=4)
     parser.add_argument('--seed', dest='seed', type=int, 
-        help='fix random seeds', action='store', default=42)
+        help='fix random seeds', action='store', default=1)
     parser.add_argument('--split', dest='split', type=float, 
         help='define train/test split, number between 0 and 1', action='store', default=0.8)
     parser.add_argument('-mp', '--mixed_precision', dest='mixed_precision',

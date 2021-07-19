@@ -9,7 +9,7 @@ import numpy as np
 from transformers import AdamW
 
 # taken from: https://datascience.stackexchange.com/questions/66345/why-ml-model-produces-different-results-despite-random-state-defined-and-how-to
-def seed_everything(seed=42, pytorch=True):
+def seed_everything(seed=1, pytorch=True):
     """"
         Seed everything.
     """   
@@ -76,7 +76,7 @@ class TextCollator():
     def __call__(self, list_items):
         # extract texts, tokenize them
         texts = [item[0] for item in list_items]
-        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=512)
+        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=256)
         inputs = {key: torch.tensor(val) for key, val in inputs.items()}
         batch = {"inputs": {"x": inputs}}
 
@@ -99,7 +99,7 @@ class EnsembleCollator():
         texts = [item[0] for item in list_items]
         list_inputs = []
         for tokenizer in self.list_tokenizers:
-            inputs = tokenizer(texts, truncation=True, padding=True, max_length=512)
+            inputs = tokenizer(texts, truncation=True, padding=True, max_length=256)
             inputs = {key: torch.tensor(val) for key, val in inputs.items()}
             list_inputs.append(inputs)
         batch = {"inputs": {"x": list_inputs}}

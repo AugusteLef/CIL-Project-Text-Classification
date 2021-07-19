@@ -77,6 +77,10 @@ python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_basic.txt -
 
 python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_basic.txt -v
 
+python3 preprocessing.py Data/train_pos_all_full.txt Data/train_pos_all_full_basic.txt -v
+
+python3 preprocessing.py Data/train_neg_all_full.txt Data/train_neg_all_full_basic.txt -v
+
 python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_augmented.txt -v -a
 
 python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_augmented.txt -v -a
