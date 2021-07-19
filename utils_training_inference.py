@@ -160,12 +160,10 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
                 loss = fn_loss(preds, labels)
                 loss /= args.accumulation_size
             scaler.scale(loss).backward()
-            loss.backward()
             avg_loss += loss.item()
             if (i + 1) % args.accumulation_size == 0:
                 scaler.step(optimizer)
                 scaler.update()
-                optimizer.step()
                 optimizer.zero_grad() 
                 if args.verbose:
                     print(
