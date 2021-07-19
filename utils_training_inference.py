@@ -9,8 +9,7 @@ import numpy as np
 from transformers import AdamW
 
 def seed_everything(seed=1, pytorch=True):
-    """"
-        Seed everything.
+    """ Seed everything.
     """   
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
