@@ -76,7 +76,7 @@ class TextCollator():
     def __call__(self, list_items):
         # extract texts, tokenize them
         texts = [item[0] for item in list_items]
-        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=512)
+        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=130)
         inputs = {key: torch.tensor(val) for key, val in inputs.items()}
         batch = {"inputs": {"x": inputs}}
 
