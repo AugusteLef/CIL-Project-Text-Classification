@@ -100,7 +100,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # set seeds
-    utils.seed_everything(seed = args.seed)
+    utils.seed_everything(seed = args.seed, pytorch=False)
 
     # start training
     main(args)
