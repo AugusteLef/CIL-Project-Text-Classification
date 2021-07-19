@@ -48,8 +48,8 @@ def main(args):
     # get model
     if args.verbose: print("loading model...")
     model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.config, num_labels=2)
+    model_huggingface.resize_token_embeddings(len(tokenizer))
     model = models.HuggingfaceModel(model_huggingface)
-    model.resize_token_embeddings(len(tokenizer))
     
     # define loss function
     fn_loss = torch.nn.CrossEntropyLoss()
