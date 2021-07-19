@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 from transformers import AdamW
 
-# taken from: https://datascience.stackexchange.com/questions/66345/why-ml-model-produces-different-results-despite-random-state-defined-and-how-to
 def seed_everything(seed=1, pytorch=True):
     """"
         Seed everything.
@@ -18,9 +17,6 @@ def seed_everything(seed=1, pytorch=True):
     np.random.seed(seed)
     if pytorch:
         torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        torch.backends.cudnn.deterministic = True
     
 def get_data_training(path_data_neg, path_data_pos, split):
     """ load positive and negative data and create training/validation split
@@ -76,7 +72,7 @@ class TextCollator():
     def __call__(self, list_items):
         # extract texts, tokenize them
         texts = [item[0] for item in list_items]
-        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=256)
+        inputs = self.tokenizer(texts, truncation=True, padding=True, max_length=120)
         inputs = {key: torch.tensor(val) for key, val in inputs.items()}
         batch = {"inputs": {"x": inputs}}
 
@@ -99,7 +95,7 @@ class EnsembleCollator():
         texts = [item[0] for item in list_items]
         list_inputs = []
         for tokenizer in self.list_tokenizers:
-            inputs = tokenizer(texts, truncation=True, padding=True, max_length=256)
+            inputs = tokenizer(texts, truncation=True, padding=True, max_length=120)
             inputs = {key: torch.tensor(val) for key, val in inputs.items()}
             list_inputs.append(inputs)
         batch = {"inputs": {"x": list_inputs}}

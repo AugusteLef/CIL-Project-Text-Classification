@@ -49,6 +49,7 @@ def main(args):
     if args.verbose: print("loading model...")
     model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.config, num_labels=2)
     model = models.HuggingfaceModel(model_huggingface)
+    model.resize_token_embeddings(len(tokenizer))
     
     # define loss function
     fn_loss = torch.nn.CrossEntropyLoss()
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # set seeds
-    utils.seed_everything(seed = args.seed, pytorch=False)
+    utils.seed_everything(seed = args.seed)
 
     # start training
     main(args)
