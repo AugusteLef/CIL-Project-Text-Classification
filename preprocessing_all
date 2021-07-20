@@ -1,0 +1,11 @@
+bsub -R "rusage[mem=8192]" -oo Output_pp/pos_full_basic python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_basic.txt -v
+bsub -R "rusage[mem=8192]" -oo Output_pp/neg_full_basic python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_basic.txt -v
+
+bsub -R "rusage[mem=8192]" -oo Output_pp/pos_all_full_basic python3 preprocessing.py Data/train_pos_all_full.txt Data/train_pos_all_full_basic.txt -v
+bsub -R "rusage[mem=8192]" -oo Output_pp/neg_all_full_basic python3 preprocessing.py Data/train_neg_all_full.txt Data/train_neg_all_full_basic.txt -v
+
+bsub -R "rusage[mem=8192]" -oo Output_pp/pos_full_augmented python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_augmented.txt -v -a
+bsub -R "rusage[mem=8192]" -oo Output_pp/neg_full_augmented python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_augmented.txt -v -a
+
+bsub -R "rusage[mem=8192]" -oo Output_pp/pos_full_pp python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_pp.txt -v -s -l -sw
+bsub -R "rusage[mem=8192]" -oo Output_pp/neg_full_pp python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_pp.txt -v -s -l -sw
