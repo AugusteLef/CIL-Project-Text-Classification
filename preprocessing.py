@@ -146,7 +146,8 @@ def basic_preprocess(tweet: str) -> str:
     tweet = re.sub('<user>', '', tweet)  # remove user tags
     tweet = re.sub('<url>', '', tweet)  # remove url tags
     tweet = re.sub('[0-9]', '', tweet)  # remove numbers
-    tweet = re.sub('#\w*', '', tweet)  # remove hashtags
+    tweet = re.sub('#', '', tweet)  # remove hashtag symbols (ADDED)
+    #tweet = re.sub('#\w*', '', tweet)  # remove hashtags and the words linked to it (REMOVED)
     tweet = re.sub('\s+', ' ', tweet)  # remove excess whitespace
     tweet = re.sub('^\s', '', tweet)  # remove excess whitespace
     tweet = re.sub('\s$', '', tweet)  # remove excess whitespace
