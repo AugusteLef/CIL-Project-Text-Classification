@@ -140,7 +140,7 @@ def training(model, dataloader_train, dataloader_test, fn_loss, device, args):
     Returns:
         None
     """
-    optimizer = AdamW(model.parameters(), lr=5e-5)
+    optimizer = AdamW(model.parameters(), lr=2e-5)
     scaler = torch.cuda.amp.GradScaler(enabled=args.mixed_precision)
     for epoch in range(args.epochs):
         model.train()
