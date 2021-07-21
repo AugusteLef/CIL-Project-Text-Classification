@@ -63,13 +63,13 @@ def main(args):
     if args.verbose: print("loading models...")
     list_models = []
     checkpoint_bart = torch.load(args.checkpoints[0], map_location=device)
-    list_models.append(models.BartModelForEnsemble(checkpoint_bart["model_state_dict"]))
+    list_models.append(models.BartModelForEnsemble(checkpoint_bart["model_state_dict"], list_tokenizers[0]))
     checkpoint_bert = torch.load(args.checkpoints[1], map_location=device)
-    list_models.append(models.BertModelForEnsemble(checkpoint_bert["model_state_dict"]))
+    list_models.append(models.BertModelForEnsemble(checkpoint_bert["model_state_dict"], list_tokenizers[1]))
     checkpoint_bertweet = torch.load(args.checkpoints[2], map_location=device)
-    list_models.append(models.BertweetModelForEnsemble(checkpoint_bertweet["model_state_dict"]))
+    list_models.append(models.BertweetModelForEnsemble(checkpoint_bertweet["model_state_dict"], list_tokenizers[2]))
     checkpoint_xlnet = torch.load(args.checkpoints[3], map_location=device)
-    list_models.append(models.XLNetModelForEnsemble(checkpoint_xlnet["model_state_dict"]))
+    list_models.append(models.XLNetModelForEnsemble(checkpoint_xlnet["model_state_dict"], list_tokenizers[3]))
     model = models.EnsembleModel(list_models, args.freeze_models, size_hidden_state=768)
     model.to(device)
 

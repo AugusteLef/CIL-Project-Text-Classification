@@ -56,6 +56,7 @@ def main(args):
     list_models = []
     for config, path_checkpoint in zip(args.configs, args.checkpoints):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained(config, num_labels=2)
+        model_huggingface.resize_token_embeddings(len(tokenizer))
         model = models.HuggingfaceModel(model_huggingface)
         checkpoint = torch.load(path_checkpoint, map_location=device)
         model.load_state_dict(checkpoint["model_state_dict"])
