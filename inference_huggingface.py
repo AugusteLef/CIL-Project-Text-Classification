@@ -39,6 +39,7 @@ def main(args):
     # build model
     if args.verbose: print("loading model...")
     model_huggingface = AutoModelForSequenceClassification.from_pretrained(args.config, num_labels=2)
+    model_huggingface.resize_token_embeddings(len(tokenizer))
     model = models.HuggingfaceModel(model_huggingface)
     
     # use gpu if possible

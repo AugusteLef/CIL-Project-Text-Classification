@@ -44,6 +44,7 @@ def main(args):
     list_models = []
     for config in args.configs:
         model_huggingface = AutoModelForSequenceClassification.from_pretrained(config, num_labels=2)
+        model_huggingface.resize_token_embeddings(len(tokenizer))
         model = models.HuggingfaceModel(model_huggingface)
         list_models.append(model)
     model = models.EnsembleModel(list_models)
