@@ -19,8 +19,9 @@ class BartModelForEnsemble(torch.nn.Module):
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
-        model.load_state_dict(model_state_dict)
         self.model = model.model_huggingface.model
+        self.model.load_state_dict(model_state_dict)
+
     
     def forward(self, x):
         outputs = self.model(**x)
