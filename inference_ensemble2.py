@@ -43,13 +43,13 @@ def main(args):
     if args.verbose: print("loading models...")
     list_models = []
     model_state_dict_bart = AutoModelForSequenceClassification.from_pretrained(args.configs[0]).state_dict()
-    list_models.append(models.BartModelForEnsemble(model_state_dict_bart))
+    list_models.append(models.BartModelForEnsemble(model_state_dict_bart).model)
     model_state_dict_bert = AutoModelForSequenceClassification.from_pretrained(args.configs[1]).state_dict()
-    list_models.append(models.BertModelForEnsemble(model_state_dict_bert))
+    list_models.append(models.BertModelForEnsemble(model_state_dict_bert).model)
     model_state_dict_bertweet = AutoModelForSequenceClassification.from_pretrained(args.configs[2]).state_dict()
-    list_models.append(models.BertweetModelForEnsemble(model_state_dict_bertweet))
+    list_models.append(models.BertweetModelForEnsemble(model_state_dict_bertweet).model)
     model_state_dict_xlnet = AutoModelForSequenceClassification.from_pretrained(args.configs[3]).state_dict()
-    list_models.append(models.XLNetModelForEnsemble(model_state_dict_xlnet))
+    list_models.append(models.XLNetModelForEnsemble(model_state_dict_xlnet).model)
     model = models.EnsembleModel(list_models, size_hidden_state=768)
     
     # use gpu if possible
