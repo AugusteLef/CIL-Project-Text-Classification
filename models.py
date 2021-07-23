@@ -32,7 +32,7 @@ class BartModelForEnsemble(torch.nn.Module):
 class BertModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict, tokenizer=None):
         super(BertModelForEnsemble, self).__init__()
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=3)
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
