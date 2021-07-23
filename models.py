@@ -32,12 +32,13 @@ class BartModelForEnsemble(torch.nn.Module):
 class BertModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict, tokenizer=None):
         super(BertModelForEnsemble, self).__init__()
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=3)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
+        self.model = model.model_huggingface
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.bert
+        
     
     def forward(self, x):
         outputs = self.model(**x)
@@ -47,13 +48,13 @@ class BertModelForEnsemble(torch.nn.Module):
 class BertweetModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict, tokenizer=None):
         super(BertweetModelForEnsemble, self).__init__()
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=2)
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=3)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
+        self.model = model.model_huggingface
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.roberta
-    
+
     def forward(self, x):
         outputs = self.model(**x)
         hidden_state_cls = outputs["last_hidden_state"][:,0]
@@ -62,12 +63,12 @@ class BertweetModelForEnsemble(torch.nn.Module):
 class XLNetModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict, tokenizer):
         super(XLNetModelForEnsemble, self).__init__()
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=2)
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
+        self.model = model.model_huggingface
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.transformer
     
     def forward(self, x):
         outputs = self.model(**x)
