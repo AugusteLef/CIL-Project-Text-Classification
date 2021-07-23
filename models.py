@@ -70,13 +70,28 @@ class XLNetModelForEnsemble(torch.nn.Module):
         return hidden_state_cls
 
 class EnsembleModel(torch.nn.Module):
-    def __init__(self, list_models, freeze_models=False, size_hidden_state=2):
+    def __init__(self, list_models, freeze_models=False, size_hidden_state=2, num_layers_dense=1):
         super(EnsembleModel, self).__init__()
         self.list_models = torch.nn.ModuleList(list_models)
-        self.layer_linear = torch.nn.Linear(
-            in_features=len(list_models) * size_hidden_state,
-            out_features=2,
-        )
+        self.num_layers_dense = num_layers_dense
+        if num_layers_dense == 1:
+            layer_linear1 = torch.nn.Linear(
+                in_features=len(list_models) * size_hidden_state,
+                out_features=2,
+            )
+            self.dense = torch.nn.Sequential(layer_linear1)
+        else:
+            size_hidden = 1024 
+            layer_linear1 = torch.nn.Linear(
+                in_features=len(list_models) * size_hidden_state,
+                out_features=size_hidden,
+            )
+            activation = torch.nn.ReLU()
+            layer_linear2 = torch.nn.Linear(
+                in_features=size_hidden,
+                out_features=2,
+            )
+            self.dense = torch.nn.Sequential(layer_linear1, activation, layer_linear2)
         if freeze_models:
             for model in self.list_models:
                 for param in model.parameters():
@@ -89,6 +104,6 @@ class EnsembleModel(torch.nn.Module):
             logits = model(x[i])
             list_logits.append(logits)
         tmp = torch.cat(list_logits, axis=1)
-        logits = self.layer_linear(tmp)
+        logits = self.dense(tmp)
         return logits
     

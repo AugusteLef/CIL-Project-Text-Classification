@@ -70,7 +70,7 @@ def main(args):
     list_models.append(models.BertweetModelForEnsemble(checkpoint_bertweet["model_state_dict"], list_tokenizers[2]))
     checkpoint_xlnet = torch.load(args.checkpoints[3], map_location=device)
     list_models.append(models.XLNetModelForEnsemble(checkpoint_xlnet["model_state_dict"], list_tokenizers[3]))
-    model = models.EnsembleModel(list_models, args.freeze_models, size_hidden_state=768)
+    model = models.EnsembleModel(list_models, args.freeze_models, 768, args.dense_layers)
     model.to(device)
 
     # define loss function
@@ -101,6 +101,10 @@ if __name__ == "__main__":
         help='path to pretrained models that should be used; order must be bart, bert, bertweet, xlnet')
     parser.add_argument('-fm', '--freeze_models', 
         help='set to freeze submodules', action='store_true')
+
+    # model arguments
+    parser.add_argument('-dl', '-dense_layers', type=int, choices=range(1,3), 
+        help='number of dense layers to use in ensemble', default=1)
 
     # training arguments
     parser.add_argument('-e', '-epochs', dest='epochs', type=int, 
