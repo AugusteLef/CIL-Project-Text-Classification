@@ -1,2 +1,0 @@
-bsub -R "rusage[mem=8192]" -oo Output_pp/test_basic python3 preprocessing.py Data/test_data.txt Data/test_basic.txt -v
-bsub -R "rusage[mem=8192]" -oo Output_pp/test_pp python3 preprocessing.py Data/test_data.txt Data/test_pp.txt -v -s -l -sw
