@@ -1,17 +1,25 @@
 ## File Structure
-Some scripts may assume the following file-structure:
+Some scripts may assume the following file-structure (you might have to create missing directories):
 - Data : Directory containing all training-, test- and preprocessed data
-- Models : Directory containing all fine-tuned models that we use for prediction.
 - Predictions : Directory containing all predictions for test-set.
 - Preprocessing_Data : Directory containing wordlists and other data used for preprocessing.
-- LectureBaselines : Directory containing implementations of the baselines from the exercises. A separate ReadMe can be found here.
+- LectureBaselines : Directory containing implementations of the baselines from the exercises. A separate ReadMe can be found here with instructions on how to reproduce the baselines.
+- Output_pp : Directory for all output (logging) files related to preprocessing
+- Output_predicting : Directory for all output (logging) files related to inference on the test-set.
+- Output_huggingface : Directory for all output (logging) files related to training the huggingface models.
+- Output_ensembles : Directory for all output (logging) files related to training the ensembles.
 
-The following scripts should be contained in the main project folder:
+The following python scripts should be contained in the main project folder:
 - preprocessing.py : Used for preprocessing data-sets with different preprocessing methods.
 - training_*.py : Training scripts for huggingface models and our ensemble models.
 - inference_*.py : Scripts used to create predictions for the test set.
 - utils_*.py : Contains some useful code-snippets used in the above scripts.
 
+All our experiments can be reproduced by running the following files with 'source' on the Leonhard cluster (more details under 'Workflow' below):
+- preprocess_all : Schedules all preprocessing jobs needed in this project. These jobs roughly take up to 1h to finish.
+- train_huggingface : Schedules all jobs for training huggingface models. These jobs roughly take 24h to finish.
+- train_ensembles : Schedules all jobs for training ensembles. These jobs roughly take 24h to finish.
+- predict_all : Schedules all jobs for making predictions on the test-set. These jobs don't take more than a few minutes to finish.
 
 ## Dataset
 
@@ -36,7 +44,6 @@ The dataset should contain the following files:
 - test_data.txt:
 - train_neg_full.txt: the full negative training samples
 - train_pos_full.txt: the full positive training samples
-
 
 ## Additional Datasets
 Download the tweet datasets:
@@ -68,80 +75,50 @@ python3 combine_datasets.py Data/train_pos_full.txt Data/train_pos_add1.txt Data
 
 ```
 
+## Running Our Experiments
 
-## General Workflow
+Guidelines for running our experiments are presented here. We assume that the git-directory has been cloned on the Leonhard cluster, that the correct file structure has been set up (i.e. adding missing directories according to description above) and that the datasets have been downloaded and put in the Data directory. Our experiments will store the models in your personal scratch space ($SCRATCH). 
+
+### Further Preparations
+
+Load necessary modules:
+```
+module load gcc/6.3.0 python_gpu/3.8.5 eth_proxy
+```
+Create and start virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+Install dependencies (make sure to be in venv):
+```bash
+pip install -r requirements.txt
+```
 
 ### Preprocessing
+You can schedule all 10 preprocessing jobs by running:
 ```
-python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_basic.txt -v
-
-python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_basic.txt -v
-
-python3 preprocessing.py Data/train_pos_all_full.txt Data/train_pos_all_full_basic.txt -v
-
-python3 preprocessing.py Data/train_neg_all_full.txt Data/train_neg_all_full_basic.txt -v
-
-python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_augmented.txt -v -a
-
-python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_augmented.txt -v -a
-
-python3 preprocessing.py Data/train_pos_full.txt Data/train_pos_full_pp.txt -v -s -l -sw
-
-python3 preprocessing.py Data/train_neg_full.txt Data/train_neg_full_pp.txt -v -s -l -sw
+source preprocess_all
 ```
+
 ### Training
+First, the huggingface models have to be trained:
 ```
-bsub -W 24:00 -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" -R "select[gpu_model0==GeForceGTX1080Ti]" -oo Output/BART_raw.out 
+source train_huggingface
 ```
-raw-data
+Once they are done, we can train the ensembles:
 ```
-python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bart_raw
-
-python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bert_raw
-
-python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/bertweet_raw
-
-python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full.txt Data/train_pos_full.txt Models/xlnet_raw
-```
-preprocessed-data
-```
-python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/xlnet_pp
-
-python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bert_pp
-
-python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bart_pp
-
-python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full_pp.txt Data/train_pos_full_pp.txt Models/bertweet_pp
-```
-augmented-data
-```
-python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bert_augmented
-
-python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bart_augmented
-
-python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/xlnet_augmented
-
-python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_full_augmented.txt Data/train_pos_full_augmented.txt Models/bertweet_augmented
-```
-additional-data
-```
-python3 training_huggingface.py -v -c bert-base-uncased -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bert_all
-
-python3 training_huggingface.py -v -c facebook/bart-base -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bart_all
-
-python3 training_huggingface.py -v -c vinai/bertweet-base -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/bertweet_all
-
-python3 training_huggingface.py -v -c xlnet-base-cased -e 3 -bs 8 -as 4 Data/train_neg_all_full.txt Data/train_pos_all_full.txt Models/xlnet_all
+source train_ensembles
 ```
 
-Create predictions for test-data:
+### Predictions
+As a last step, we create the predictions using the trained models:
 ```
-python3 inference.py Data/test_data_basic.txt Predictions/bart-base_basic.csv -dt Pretrained_Models/bart-base/ -dm Models/bart-base_basic/checkpoint_3 
-
-python3 inference.py Data/test_data_basic.txt Predictions/bert-base-uncased_basic.csv -dt Pretrained_Models/bert-base-uncased/ -dm Models/bert-base-uncased_basic/checkpoint_3 
-
-python3 inference.py Data/test_data_basic.txt Predictions/xlnet-base-cased_basic.csv -dt Pretrained_Models/xlnet-base-cased/ -dm Models/xlnet-base-cased_basic/checkpoint_3 -x
+source predict_all
 ```
+
+## Miscellaneous
+I never manage to remember all of it, hence I put here a list of handy commands.
 
 ## Virtual Environment & Dependencies
 
@@ -184,5 +161,6 @@ bsub -I -R "rusage[mem=8192]" -R "rusage[ngpus_excl_p=1]" python3 main.py [args]
 ```
 Monitoring job:
 ```
+bjobs
 bbjobs
 ```

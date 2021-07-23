@@ -78,14 +78,6 @@ EXPERIMENTS = [
         'test_data' : '../Data/test_data.txt',
         'model' : LogisticRegression(C=1e5, max_iter=500),
         'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
-    },
-    {
-        'name' : 'glove_full_200d_preprocessed', 
-        'neg_data' : '../Data/train_neg_full_glove.txt', 
-        'pos_data' :'../Data/train_pos_full_glove.txt',
-        'test_data' : '../Data/test_data.txt',
-        'model' : LogisticRegression(C=1e5, max_iter=500),
-        'vectorizer' : vectorizers.AverageGlove('Embeddings/glove.twitter.27B.200d.txt')
     }
 ]
     
