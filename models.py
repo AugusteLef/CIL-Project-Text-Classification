@@ -61,7 +61,7 @@ class BertweetModelForEnsemble(torch.nn.Module):
         return hidden_state_cls
 
 class XLNetModelForEnsemble(torch.nn.Module):
-    def __init__(self, model_state_dict, tokenizer):
+    def __init__(self, model_state_dict, tokenizer=None):
         super(XLNetModelForEnsemble, self).__init__()
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=2)
         if tokenizer is not None:
