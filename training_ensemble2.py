@@ -103,7 +103,7 @@ if __name__ == "__main__":
         help='set to freeze submodules', action='store_true')
 
     # model arguments
-    parser.add_argument('-dl', '-dense_layers', type=int, choices=range(1,3), 
+    parser.add_argument('-dl', '-dense_layers', dest='dense_layers', type=int, choices=range(1,3), 
         help='number of dense layers to use in ensemble', default=1)
 
     # training arguments
