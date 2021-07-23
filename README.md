@@ -120,7 +120,7 @@ source predict_all
 ## Miscellaneous
 I never manage to remember all of it, hence I put here a list of handy commands.
 
-## Virtual Environment & Dependencies
+### Virtual Environment & Dependencies
 
 Start virtual environment:
 ```bash
@@ -140,7 +140,7 @@ Install dependencies (make sure to be in venv):
 pip install -r requirements.txt
 ```
 
-## Leonhard Cluster
+### Leonhard Cluster
 
 Load modules:
 ```
