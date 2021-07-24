@@ -46,10 +46,8 @@ The dataset should contain the following files:
 - train_pos_full.txt: the full positive training samples
 
 ## Additional Datasets
-Download the tweet datasets:
-```
-wget [download link]
-```
+Download the datasets directly from kaggle competition: [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv) and [Tweet Sentiment Extraction](https://www.kaggle.com/c/tweet-sentiment-extraction/data?select=train.csv) or directly via the [polybox link](https://polybox.ethz.ch/index.php/s/hKKm1H0hD4lmr6t) using the following password: AddDatasets
+
 
 Match the format of the original dataset and create a positive and negative datasets (save them in Data/):
 - For the dataset from [Sentiment140](https://www.kaggle.com/kazanova/sentiment140?select=training.1600000.processed.noemoticon.csv)
