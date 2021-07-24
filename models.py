@@ -19,7 +19,7 @@ class BartModelForEnsemble(torch.nn.Module):
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model_huggingface.load_state_dict(model_state_dict)
-        self.model = HuggingfaceModel(model_huggingface)
+        self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
     
     def forward(self, x):
         outputs = self.model(**x)
@@ -34,7 +34,7 @@ class BertModelForEnsemble(torch.nn.Module):
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model_huggingface.load_state_dict(model_state_dict)
-        self.model = HuggingfaceModel(model_huggingface)
+        self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
         
     
     def forward(self, x):
@@ -49,7 +49,7 @@ class BertweetModelForEnsemble(torch.nn.Module):
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model_huggingface.load_state_dict(model_state_dict)
-        self.model = HuggingfaceModel(model_huggingface)
+        self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
 
     def forward(self, x):
         outputs = self.model(**x)
@@ -63,7 +63,7 @@ class XLNetModelForEnsemble(torch.nn.Module):
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model_huggingface.load_state_dict(model_state_dict)
-        self.model = HuggingfaceModel(model_huggingface)
+        self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
     
     def forward(self, x):
         outputs = self.model(**x)
