@@ -18,10 +18,8 @@ class BartModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("facebook/bart-base", num_labels=3)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        model = HuggingfaceModel(model_huggingface)
-        self.model = model.model_huggingface
-        self.model.load_state_dict(model_state_dict)
-
+        model_huggingface.load_state_dict(model_state_dict)
+        self.model = HuggingfaceModel(model_huggingface)
     
     def forward(self, x):
         outputs = self.model(**x)
@@ -35,9 +33,8 @@ class BertModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        model = HuggingfaceModel(model_huggingface)
-        self.model = model.model_huggingface
-        self.model.load_state_dict(model_state_dict)
+        model_huggingface.load_state_dict(model_state_dict)
+        self.model = HuggingfaceModel(model_huggingface)
         
     
     def forward(self, x):
@@ -51,9 +48,8 @@ class BertweetModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        model = HuggingfaceModel(model_huggingface)
-        self.model = model.model_huggingface
-        self.model.load_state_dict(model_state_dict)
+        model_huggingface.load_state_dict(model_state_dict)
+        self.model = HuggingfaceModel(model_huggingface)
 
     def forward(self, x):
         outputs = self.model(**x)
@@ -66,9 +62,8 @@ class XLNetModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        model = HuggingfaceModel(model_huggingface)
-        self.model = model.model_huggingface
-        self.model.load_state_dict(model_state_dict)
+        model_huggingface.load_state_dict(model_state_dict)
+        self.model = HuggingfaceModel(model_huggingface)
     
     def forward(self, x):
         outputs = self.model(**x)
