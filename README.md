@@ -61,7 +61,7 @@ python3 additional_dataset_1.py dataset1.csv
 python3 additional_dataset_2.py dataset2.csv
 
 ```
-Combine all datasets:
+Combine all datasets and output the resulting datasets into the 'Data' folder [WARNING: make sure you created the 'Data' folder as mentioned in section *Dataset*]:
 - for negative:
 ```
 python3 combine_datasets.py Data/train_neg_full.txt Data/train_neg_add1.txt Data/train_neg_add2.txt train_neg_all_full.txt
