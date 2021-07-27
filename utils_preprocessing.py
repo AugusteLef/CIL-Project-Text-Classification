@@ -52,6 +52,15 @@ def get_synonyms(word):
 
     Returns:
         list of synonyms of word
+        
+    Author: 
+        Maël Fabien
+        
+    Date: 
+        2019
+        
+    Availability:
+        maelfabien.github.io/machinelearning/NLP_8/#
     """
     synonyms = set()
 
@@ -75,6 +84,15 @@ def synonym_replacement(words, n):
 
     Returns:
         list of synonyms of word
+        
+    Author: 
+        Maël Fabien
+        
+    Date: 
+        2019
+        
+    Availability:
+        maelfabien.github.io/machinelearning/NLP_8/#
     """
 
     words = words.split()
