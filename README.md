@@ -23,7 +23,7 @@ All our experiments can be reproduced by running the following files with 'sourc
 
 ## Dataset
 
-TODO: Add polybox link that leads to preprocessed datasets we use in experiments.
+[All the preprocessed datasets used for our experiments can be directly downloaded on this [polbyox](https://polybox.ethz.ch/index.php/s/6FXs2MQqnVHvPiJ), password: data]
 
 Download the tweet dataset:
 ```
