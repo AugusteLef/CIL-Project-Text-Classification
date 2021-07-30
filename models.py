@@ -18,13 +18,14 @@ class BartModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("facebook/bart-base", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        self.model = HuggingfaceModel(model_huggingface)
-        self.model.load_state_dict(model_state_dict)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.model
         # self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
     
-    def forward(self, input_ids):
+    def forward(self, x):
         outputs = self.model(**x)
-        mask_eos = input_ids["input_ids"].eq(self.model.config.eos_token_id)
+        mask_eos = x["input_ids"].eq(self.model.config.eos_token_id)
         hidden_state_eos = outputs["last_hidden_state"][mask_eos]
         return hidden_state_eos
 
@@ -34,8 +35,9 @@ class BertModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        self.model = HuggingfaceModel(model_huggingface)
-        self.model.load_state_dict(model_state_dict)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.model
         
     
     def forward(self, x):
@@ -49,8 +51,9 @@ class BertweetModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("vinai/bertweet-base", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        self.model = HuggingfaceModel(model_huggingface)
-        self.model.load_state_dict(model_state_dict)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.model
 
     def forward(self, x):
         outputs = self.model(**x)
@@ -63,8 +66,9 @@ class XLNetModelForEnsemble(torch.nn.Module):
         model_huggingface = AutoModelForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
-        self.model = HuggingfaceModel(model_huggingface)
-        self.model.load_state_dict(model_state_dict)
+        model = HuggingfaceModel(model_huggingface)
+        model.load_state_dict(model_state_dict)
+        self.model = model.model_huggingface.model
     
     def forward(self, x):
         outputs = self.model(**x)
