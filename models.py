@@ -37,7 +37,7 @@ class BertModelForEnsemble(torch.nn.Module):
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.model
+        self.model = model.model_huggingface.bert
         
     
     def forward(self, x):
@@ -53,7 +53,7 @@ class BertweetModelForEnsemble(torch.nn.Module):
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.model
+        self.model = model.model_huggingface.roberta
 
     def forward(self, x):
         outputs = self.model(**x)
@@ -68,7 +68,7 @@ class XLNetModelForEnsemble(torch.nn.Module):
             model_huggingface.resize_token_embeddings(len(tokenizer))
         model = HuggingfaceModel(model_huggingface)
         model.load_state_dict(model_state_dict)
-        self.model = model.model_huggingface.model
+        self.model = model.model_huggingface.transformer
     
     def forward(self, x):
         outputs = self.model(**x)
