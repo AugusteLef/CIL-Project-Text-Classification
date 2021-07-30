@@ -15,7 +15,7 @@ class HuggingfaceModel(torch.nn.Module):
 class BartModelForEnsemble(torch.nn.Module):
     def __init__(self, model_state_dict, tokenizer=None):
         super(BartModelForEnsemble, self).__init__()
-        model_huggingface = AutoModelForSequenceClassification.from_pretrained("facebook/bart-base", num_labels=3)
+        model_huggingface = AutoModelForSequenceClassification.from_pretrained("facebook/bart-base", num_labels=2)
         if tokenizer is not None:
             model_huggingface.resize_token_embeddings(len(tokenizer))
         self.model = HuggingfaceModel(model_huggingface)
