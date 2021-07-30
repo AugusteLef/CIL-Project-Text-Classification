@@ -22,9 +22,9 @@ class BartModelForEnsemble(torch.nn.Module):
         self.model.load_state_dict(model_state_dict)
         # self.model = HuggingfaceModel(model_huggingface).model_huggingface.model
     
-    def forward(self, x):
+    def forward(self, input_ids):
         outputs = self.model(**x)
-        mask_eos = x["input_ids"].eq(self.model.config.eos_token_id)
+        mask_eos = input_ids["input_ids"].eq(self.model.config.eos_token_id)
         hidden_state_eos = outputs["last_hidden_state"][mask_eos]
         return hidden_state_eos
 
